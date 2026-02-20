@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recipe to Flowchart Converter</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .input-section {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            margin-bottom: 30px;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .input-group input {
+            flex: 1;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .input-group button {
+            padding: 15px 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .input-group button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .input-group button:active {
+            transform: translateY(0);
+        }
+
+        .input-group button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #667eea;
+            font-size: 18px;
+            display: none;
+        }
+
+        .error {
+            background: #fee;
+            color: #c33;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            display: none;
+        }
+
+        .flowchart-section {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            min-height: 400px;
+        }
+
+        .flowchart-section h2 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        #mermaid-container {
+            overflow-x: auto;
+            padding: 20px;
+            background: #f9f9f9;
+            border-radius: 8px;
+        }
+
+        .mermaid {
+            text-align: center;
+        }
+
+        .recipe-info {
+            background: #f0f0f0;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .recipe-info h3 {
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .recipe-info p {
+            color: #666;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🍳 Recipe to Flowchart Converter</h1>
+            <p>Transform any recipe into a visual flowchart</p>
+        </div>
+
+        <div class="input-section">
+            <div class="input-group">
+                <input 
+                    type="url" 
+                    id="recipeUrl" 
+                    placeholder="Enter recipe URL (e.g., https://www.allrecipes.com/recipe/...)"
+                    autocomplete="off"
+                >
+                <button id="convertBtn" onclick="convertRecipe()">Convert to Flowchart</button>
+            </div>
+            <div class="loading" id="loading">Processing recipe...</div>
+            <div class="error" id="error"></div>
+        </div>
+
+        <div class="flowchart-section" id="flowchartSection" style="display: none;">
+            <div class="recipe-info" id="recipeInfo"></div>
+            <h2>Recipe Flowchart</h2>
+            <div id="mermaid-container">
+                <div class="mermaid" id="mermaid-diagram"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        mermaid.initialize({ 
+            startOnLoad: false,
+            theme: 'default',
+            flowchart: {
+                useMaxWidth: true,
+                htmlLabels: true,
+                curve: 'basis'
+            }
+        });
+
+        async function convertRecipe() {
+            const url = document.getElementById('recipeUrl').value.trim();
+            const loading = document.getElementById('loading');
+            const error = document.getElementById('error');
+            const flowchartSection = document.getElementById('flowchartSection');
+            const convertBtn = document.getElementById('convertBtn');
+
+            if (!url) {
+                error.textContent = 'Please enter a recipe URL';
+                error.style.display = 'block';
+                return;
+            }
+
+            // Reset UI
+            error.style.display = 'none';
+            flowchartSection.style.display = 'none';
+            loading.style.display = 'block';
+            convertBtn.disabled = true;
+
+            try {
+                // Use CORS proxy to fetch the recipe page
+                const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`;
+                const response = await fetch(proxyUrl);
+
+                if (!response.ok) {
+                    throw new Error('Failed to fetch recipe page');
+                }
+
+                const data = await response.json();
+                const html = data.contents;
+
+                // Extract recipe from HTML
+                const recipe = extractRecipe(html, url);
+
+                if (!recipe.ingredients || recipe.ingredients.length === 0) {
+                    throw new Error('Could not extract recipe data from the URL. Please try a different recipe site.');
+                }
+
+                // Generate Mermaid flowchart
+                const mermaidCode = generateMermaidFlowchart(recipe);
+                
+                // Display recipe info
+                const recipeInfo = document.getElementById('recipeInfo');
+                recipeInfo.innerHTML = `
+                    <h3>${recipe.title || 'Recipe'}</h3>
+                    ${recipe.description ? `<p>${recipe.description}</p>` : ''}
+                `;
+
+                // Render Mermaid diagram
+                const mermaidDiagram = document.getElementById('mermaid-diagram');
+                mermaidDiagram.textContent = mermaidCode;
+                
+                flowchartSection.style.display = 'block';
+                
+                // Re-render Mermaid
+                mermaid.run({
+                    nodes: [mermaidDiagram]
+                });
+
+            } catch (err) {
+                error.textContent = err.message || 'An error occurred while processing the recipe';
+                error.style.display = 'block';
+            } finally {
+                loading.style.display = 'none';
+                convertBtn.disabled = false;
+            }
+        }
+
+        function extractRecipe(html, url) {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+            const recipe = {
+                title: '',
+                description: '',
+                ingredients: [],
+                steps: []
+            };
+
+            // Extract title
+            recipe.title = doc.querySelector('h1')?.textContent?.trim() ||
+                          doc.querySelector('[class*="title"]')?.textContent?.trim() ||
+                          doc.querySelector('title')?.textContent?.trim() ||
+                          '';
+
+            // Extract description
+            recipe.description = doc.querySelector('[class*="description"]')?.textContent?.trim() ||
+                               doc.querySelector('[itemprop="description"]')?.textContent?.trim() ||
+                               '';
+
+            // Extract ingredients
+            const ingredientSelectors = [
+                '[itemprop="recipeIngredient"]',
+                '[class*="ingredient"]',
+                '[class*="ingredients"] li',
+                'ul[class*="ingredient"] li',
+                'ol[class*="ingredient"] li'
+            ];
+
+            for (const selector of ingredientSelectors) {
+                const ingredients = doc.querySelectorAll(selector);
+                if (ingredients.length > 0) {
+                    ingredients.forEach(el => {
+                        const text = el.textContent?.trim();
+                        if (text && !recipe.ingredients.includes(text)) {
+                            recipe.ingredients.push(text);
+                        }
+                    });
+                    if (recipe.ingredients.length > 0) break;
+                }
+            }
+
+            // Extract steps
+            const stepSelectors = [
+                '[itemprop="recipeInstructions"] li',
+                '[itemprop="recipeInstructions"] p',
+                '[class*="instruction"] li',
+                '[class*="step"] li',
+                '[class*="direction"] li',
+                'ol[class*="instruction"] li',
+                'ol[class*="step"] li'
+            ];
+
+            for (const selector of stepSelectors) {
+                const steps = doc.querySelectorAll(selector);
+                if (steps.length > 0) {
+                    steps.forEach(el => {
+                        const text = el.textContent?.trim();
+                        if (text && text.length > 10) {
+                            recipe.steps.push(text);
+                        }
+                    });
+                    if (recipe.steps.length > 0) break;
+                }
+            }
+
+            return recipe;
+        }
+
+        function generateMermaidFlowchart(recipe) {
+            const { ingredients, steps, title } = recipe;
+            
+            if (!ingredients || ingredients.length === 0) {
+                return 'graph TD\n    A[No recipe data]';
+            }
+
+            const processes = parseSteps(steps, ingredients);
+            const recipeTitle = cleanNodeName(title || 'prepare recipe');
+            
+            // Start with subgraph
+            let mermaid = 'graph LR\n';
+            mermaid += `    subgraph "${recipeTitle}"\n\n`;
+            mermaid += `    %% Ingredients/Inputs\n`;
+            
+            const ingredientNodes = {};
+            const ingredientNames = extractIngredientNames(ingredients);
+            const processIngredientMap = {}; // Map process index to its ingredients
+            
+            // Create process nodes first (needed for ingredient connections)
+            const processNodes = {};
+            processes.forEach((process, idx) => {
+                const nodeId = `p${idx + 1}`;
+                processNodes[idx] = nodeId;
+            });
+            
+            // Create ingredient nodes (circular) - assign IDs first
+            ingredientNames.forEach((ing, idx) => {
+                const nodeId = `i${idx + 1}`;
+                ingredientNodes[ing] = nodeId;
+            });
+
+            // Group ingredients by which process they go to
+            processes.forEach((process, procIdx) => {
+                if (!processIngredientMap[procIdx]) {
+                    processIngredientMap[procIdx] = [];
+                }
+                process.inputIngredients.forEach(ing => {
+                    const ingNodeId = findIngredientNode(ing, ingredientNodes, ingredientNames);
+                    if (ingNodeId && !processIngredientMap[procIdx].includes(ingNodeId)) {
+                        processIngredientMap[procIdx].push(ingNodeId);
+                    }
+                });
+            });
+
+            // Add unassigned ingredients to first process
+            const allIngNodeIds = Object.values(ingredientNodes);
+            const assignedIngs = new Set();
+            Object.values(processIngredientMap).forEach(ings => {
+                ings.forEach(ing => assignedIngs.add(ing));
+            });
+            
+            const unassignedIngs = allIngNodeIds.filter(ing => !assignedIngs.has(ing));
+            if (unassignedIngs.length > 0 && processes.length > 0) {
+                if (!processIngredientMap[0]) processIngredientMap[0] = [];
+                unassignedIngs.forEach(ing => {
+                    if (!processIngredientMap[0].includes(ing)) {
+                        processIngredientMap[0].push(ing);
+                    }
+                });
+            }
+
+            // Output ingredients grouped by process (like the example)
+            Object.keys(processIngredientMap).sort((a, b) => parseInt(a) - parseInt(b)).forEach((procIdx, groupIdx) => {
+                const ings = processIngredientMap[procIdx];
+                ings.forEach((ingNodeId) => {
+                    const ingName = Object.keys(ingredientNodes).find(k => ingredientNodes[k] === ingNodeId);
+                    const cleanIng = cleanNodeName(ingName || ingNodeId);
+                    const procNodeId = processNodes[procIdx];
+                    mermaid += `    ${ingNodeId}(${cleanIng}) --- ${procNodeId}\n`;
+                });
+                // Add blank line between ingredient groups (except after last)
+                if (groupIdx < Object.keys(processIngredientMap).length - 1) {
+                    mermaid += `\n`;
+                }
+            });
+            mermaid += `\n`;
+
+            // Create process nodes (rectangular with double brackets)
+            mermaid += `    %% Processes\n`;
+            processes.forEach((process, idx) => {
+                const nodeId = processNodes[idx];
+                const cleanProcess = cleanNodeName(process.name);
+                mermaid += `    ${nodeId}[[${cleanProcess}]]\n`;
+            });
+            mermaid += `\n`;
+
+            // Connect processes with labeled flows
+            mermaid += `    %% Flow\n`;
+            processes.forEach((process, procIdx) => {
+                const procNodeId = processNodes[procIdx];
+                if (procIdx < processes.length - 1) {
+                    const nextProcNodeId = processNodes[procIdx + 1];
+                    // Create shorter, cleaner output labels
+                    let outputName = process.output;
+                    if (!outputName) {
+                        // Try to extract a meaningful output name from the process
+                        const processName = cleanNodeName(process.name).toLowerCase();
+                        if (processName.includes('mix') || processName.includes('combine')) {
+                            outputName = 'mixture';
+                        } else if (processName.includes('cook') || processName.includes('fry') || processName.includes('sauté')) {
+                            outputName = 'cooked ingredients';
+                        } else if (processName.includes('chop') || processName.includes('dice') || processName.includes('slice')) {
+                            outputName = 'prepared ingredients';
+                        } else {
+                            outputName = processName.substring(0, 20) + ' result';
+                        }
+                    }
+                    mermaid += `    ${procNodeId} -- "${cleanNodeName(outputName)}" --> ${nextProcNodeId}\n`;
+                }
+            });
+            mermaid += `\n`;
+
+            // Final output
+            mermaid += `    %% Outputs\n`;
+            const finalOutputId = 'out';
+            const lastProcId = processNodes[processes.length - 1];
+            if (lastProcId) {
+                mermaid += `    ${lastProcId} --- ${finalOutputId}(finished dish)\n`;
+            }
+
+            mermaid += `\n    end\n`;
+
+            return mermaid;
+        }
+
+        function parseSteps(steps, allIngredients) {
+            if (!steps || steps.length === 0) return [];
+            const processes = [];
+            const ingredientNames = extractIngredientNames(allIngredients);
+            
+            steps.forEach((step, idx) => {
+                const processName = extractProcessName(step);
+                const inputIngredients = extractIngredientsFromStep(step, ingredientNames);
+                const output = extractOutput(step);
+                
+                processes.push({
+                    name: processName || `Step ${idx + 1}`,
+                    inputIngredients: inputIngredients,
+                    output: output,
+                    originalStep: step
+                });
+            });
+
+            return processes;
+        }
+
+        function extractIngredientNames(ingredients) {
+            return ingredients.map(ing => {
+                let name = ing
+                    .replace(/^\d+\s*[\/\d\s]*\s*(cup|tbsp|tsp|oz|lb|g|kg|ml|l|piece|pieces|whole|halves|cloves?|slices?|dashes?|pinches?|drops?)\s+/i, '')
+                    .replace(/^\d+\s*[\/\d\s]*\s*/i, '')
+                    .replace(/\s*\([^)]*\)\s*/g, '')
+                    .trim();
+                name = name.replace(/^\d+\s*/, '');
+                return name || ing;
+            });
+        }
+
+        function extractProcessName(step) {
+            const cookingVerbs = [
+                'mix', 'combine', 'add', 'stir', 'whisk', 'beat', 'blend',
+                'cook', 'bake', 'fry', 'sauté', 'boil', 'simmer', 'roast',
+                'chop', 'dice', 'slice', 'mince', 'grate', 'peel',
+                'separate', 'divide', 'cut', 'prepare', 'make', 'create',
+                'pour', 'transfer', 'place', 'arrange', 'layer', 'spread',
+                'roll', 'fold', 'knead', 'press', 'form', 'shape',
+                'season', 'salt', 'pepper', 'flavor', 'marinate'
+            ];
+
+            const words = step.toLowerCase().split(/\s+/);
+            
+            for (let i = 0; i < words.length; i++) {
+                const word = words[i].replace(/[^a-z]/g, '');
+                if (cookingVerbs.includes(word)) {
+                    const processWords = words.slice(i, Math.min(i + 4, words.length));
+                    return processWords.join(' ').replace(/[^\w\s]/g, ' ').trim();
+                }
+            }
+
+            return step.split(/\s+/).slice(0, 6).join(' ').replace(/[^\w\s]/g, ' ').trim();
+        }
+
+        function extractIngredientsFromStep(step, ingredientNames) {
+            const stepLower = step.toLowerCase();
+            const foundIngredients = [];
+            
+            ingredientNames.forEach(ingName => {
+                const ingLower = ingName.toLowerCase();
+                const words = ingLower.split(/\s+/);
+                if (words.length === 1) {
+                    const regex = new RegExp(`\\b${words[0]}\\b`, 'i');
+                    if (regex.test(step)) {
+                        foundIngredients.push(ingName);
+                    }
+                } else {
+                    const allWordsPresent = words.every(word => stepLower.includes(word));
+                    if (allWordsPresent) {
+                        foundIngredients.push(ingName);
+                    }
+                }
+            });
+
+            return foundIngredients;
+        }
+
+        function extractOutput(step) {
+            const outputPatterns = [
+                /(?:to make|to create|to form|to produce)\s+([^,\.]+)/i,
+                /(?:into|as)\s+([^,\.]+)/i,
+                /(?:result|yields?|produces?)\s+([^,\.]+)/i
+            ];
+
+            for (const pattern of outputPatterns) {
+                const match = step.match(pattern);
+                if (match && match[1]) {
+                    return match[1].trim();
+                }
+            }
+
+            return null;
+        }
+
+        function findIngredientNode(ingredient, ingredientNodes, allIngredients) {
+            const ingLower = ingredient.toLowerCase();
+            
+            // First try exact match in ingredientNodes map
+            for (const [key, nodeId] of Object.entries(ingredientNodes)) {
+                if (key.toLowerCase().includes(ingLower) || ingLower.includes(key.toLowerCase())) {
+                    return nodeId;
+                }
+            }
+
+            // Fallback: find by index in allIngredients
+            for (let i = 0; i < allIngredients.length; i++) {
+                if (allIngredients[i].toLowerCase().includes(ingLower)) {
+                    // Check if this ingredient has a node ID
+                    const ingName = extractIngredientNames([allIngredients[i]])[0];
+                    if (ingredientNodes[ingName]) {
+                        return ingredientNodes[ingName];
+                    }
+                    // Otherwise create node ID based on position
+                    return `i${i + 1}`;
+                }
+            }
+
+            return null;
+        }
+
+        function cleanNodeName(name) {
+            if (!name) return '';
+            return name
+                .replace(/\s+/g, ' ')
+                .trim()
+                .substring(0, 40)
+                .replace(/"/g, "'");
+        }
+
+        // Allow Enter key to submit
+        document.getElementById('recipeUrl').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                convertRecipe();
+            }
+        });
+    </script>
+</body>
+</html>
