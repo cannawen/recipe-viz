@@ -1,0 +1,11 @@
+# Local .env file (never commit API keys)
+.env
+
+# Cabal / GHC
+dist-newstyle/
+.ghc.environment.*
+
+# IDE
+.idea/
+*.swp
+*.swo
