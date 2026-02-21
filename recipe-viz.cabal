@@ -14,6 +14,9 @@ executable recipe-viz
     openai >=2.2,
     dotenv >=0.12,
     text,
-    vector
+    vector,
+    http-client,
+    http-client-tls,
+    bytestring
   default-language: Haskell2010
   ghc-options:      -Wall
