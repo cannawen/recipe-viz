@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>URL Submit Demo</title>
+    <style>
+      body {
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        max-width: 680px;
+        margin: 40px auto;
+        padding: 0 16px;
+      }
+      form {
+        display: flex;
+        gap: 8px;
+      }
+      input {
+        flex: 1;
+        padding: 8px;
+      }
+      button {
+        padding: 8px 14px;
+      }
+      #result {
+        margin-top: 16px;
+        font-weight: 600;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Submit URL</h1>
+    <form id="url-form">
+      <input id="url-input" type="url" placeholder="https://example.com" required />
+      <button type="submit">Send</button>
+    </form>
+    <p id="result"></p>
+
+    <script>
+      const form = document.getElementById("url-form");
+      const urlInput = document.getElementById("url-input");
+      const result = document.getElementById("result");
+
+      form.addEventListener("submit", async (event) => {
+        event.preventDefault();
+
+        result.textContent = "Loading...";
+
+        const response = await fetch("/api/submit-url", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ url: urlInput.value })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          result.textContent = data.error || "Request failed";
+          return;
+        }
+
+        result.textContent = data.message;
+      });
+    </script>
+  </body>
+</html>
