@@ -1,6 +1,8 @@
 # recipe-viz
 
-A small Haskell program that calls the OpenAI API (e.g. to get a joke). The API key is read from the environment so it is never hard-coded or committed.
+A Haskell program that calls the OpenAI API to turn a hard-coded URL into a mermaid data structure
+
+![Flor chaer](mermaid-viz.png)
 
 ## Setup
 
@@ -25,13 +27,9 @@ A small Haskell program that calls the OpenAI API (e.g. to get a joke). The API 
    cabal run recipe-viz
    ```
 
-   The program loads variables from `.env` (if present) then reads `OPENAI_API_KEY` and calls the OpenAI chat completions API with the prompt “tell me a joke”.
+   The program loads variables from `.env` (if present) then reads `OPENAI_API_KEY` and calls the OpenAI chat completions API with the prompt to create a mermaid data structure.
 
 ## Requirements
 
 - GHC and Cabal (e.g. from [GHCup](https://www.haskell.org/ghcup/))
 - An OpenAI API key
-
-## Security note
-
-If you ever paste an API key into chat or commit it by mistake, revoke that key in the OpenAI dashboard and create a new one.
