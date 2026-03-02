@@ -26,6 +26,19 @@
         margin-top: 16px;
         font-weight: 600;
       }
+      #json-output {
+        margin-top: 12px;
+        padding: 12px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        font-size: 12px;
+        white-space: pre-wrap;
+        word-break: break-word;
+      }
+      #flowchart {
+        margin-top: 16px;
+        overflow: auto;
+      }
     </style>
   </head>
   <body>
@@ -35,16 +48,37 @@
       <button type="submit">Send</button>
     </form>
     <p id="result"></p>
+    <pre id="json-output"></pre>
+    <div id="flowchart"></div>
 
-    <script>
+    <script type="module">
+      import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs";
+
+      mermaid.initialize({ startOnLoad: false, securityLevel: "loose" });
+
       const form = document.getElementById("url-form");
       const urlInput = document.getElementById("url-input");
       const result = document.getElementById("result");
+      const jsonOutput = document.getElementById("json-output");
+      const flowchart = document.getElementById("flowchart");
+
+      async function renderFlowchart(markup) {
+        if (!markup) {
+          flowchart.innerHTML = "";
+          return;
+        }
+
+        const id = `recipe-flowchart-${Date.now()}`;
+        const { svg } = await mermaid.render(id, markup);
+        flowchart.innerHTML = svg;
+      }
 
       form.addEventListener("submit", async (event) => {
         event.preventDefault();
 
         result.textContent = "Loading...";
+        jsonOutput.textContent = "";
+        flowchart.innerHTML = "";
 
         const response = await fetch("/api/submit-url", {
           method: "POST",
@@ -53,6 +87,7 @@
         });
 
         const data = await response.json();
+        
         console.log(data)
 
         if (!response.ok) {
@@ -60,7 +95,9 @@
           return;
         }
 
-        result.textContent = data.message;
+        result.textContent = "Recipe graph generated.";
+        jsonOutput.textContent = JSON.stringify(data, null, 2);
+        await renderFlowchart(data.flowchartMermaid);
       });
     </script>
   </body>

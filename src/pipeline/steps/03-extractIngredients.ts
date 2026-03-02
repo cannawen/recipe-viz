@@ -1,21 +1,8 @@
 import { GoogleGenAI } from "@google/genai";
 import type { IngredientExtractionResult } from "../types";
+import { safeJsonParse } from "./shared";
 
 const MODEL_NAME = "gemini-3-flash-preview";
-
-function safeJsonParse(value: string): IngredientExtractionResult {
-  try {
-    return JSON.parse(value) as IngredientExtractionResult;
-  } catch {
-    const cleaned = value
-      .replace(/^```json\s*/i, "")
-      .replace(/^```\s*/i, "")
-      .replace(/```\s*$/i, "")
-      .trim();
-
-    return JSON.parse(cleaned) as IngredientExtractionResult;
-  }
-}
 
 export async function extractIngredients(
   ai: GoogleGenAI,
@@ -43,7 +30,7 @@ export async function extractIngredients(
   });
 
   const text = response.text ?? "";
-  const parsed = safeJsonParse(text);
+  const parsed = safeJsonParse<IngredientExtractionResult>(text);
 
   return {
     sourceUrl,
