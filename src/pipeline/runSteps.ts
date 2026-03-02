@@ -29,22 +29,39 @@ export function validateRecipeUrl(url: string): URL {
 
 export async function processRecipeUrl(ai: GoogleGenAI, url: string): Promise<RecipeGraphData> {
   const parsedUrl = validateRecipeUrl(url);
+  console.log(`[pipeline] Step 00 done: validated URL (${parsedUrl.toString()})`);
+
   const html = await fetchHtml(parsedUrl);
+  console.log("[pipeline] Step 01 done: fetched HTML");
+
   const text = htmlToText(html);
+  console.log("[pipeline] Step 02 done: converted HTML to text");
+
   const ingredientResult = await extractIngredients(ai, parsedUrl.toString(), text);
+  console.log(
+    `[pipeline] Step 03 done: extracted ingredients (${ingredientResult.ingredients.length})`,
+  );
+
   const equipmentResult = await extractEquipment(ai, text, ingredientResult.ingredients);
+  console.log(`[pipeline] Step 04 done: extracted equipment (${equipmentResult.equipment.length})`);
+
   const ingredientEquipmentResult = await linkIngredientsToEquipment(
     ai,
     text,
     ingredientResult.ingredients,
     equipmentResult.equipment,
   );
+  console.log(
+    `[pipeline] Step 05 done: linked ingredients to equipment (${ingredientEquipmentResult.links.length})`,
+  );
+
   const actionResult = await extractActionMetadata(
     ai,
     text,
     ingredientResult.ingredients,
     equipmentResult.equipment,
   );
+  console.log(`[pipeline] Step 06 done: extracted action metadata (${actionResult.actions.length})`);
 
   const combined = combineRecipeJson({
     sourceUrl: parsedUrl.toString(),
@@ -60,6 +77,10 @@ export async function processRecipeUrl(ai: GoogleGenAI, url: string): Promise<Re
       ...(actionResult.warnings ?? []),
     ],
   });
+  console.log("[pipeline] Step 07 done: combined recipe JSON");
 
-  return buildFlowchart(combined);
+  const flowchart = buildFlowchart(combined);
+  console.log("[pipeline] Step 08 done: built flowchart");
+
+  return flowchart;
 }
