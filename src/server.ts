@@ -1,22 +1,38 @@
+import "dotenv/config";
 import express from "express";
 import path from "path";
+import { GoogleGenAI } from "@google/genai";
 
 const app = express();
 const port = process.env.PORT || 3000;
+const geminiApiKey = process.env.GEMINI_API_KEY;
+
+if (!geminiApiKey) {
+  throw new Error("Missing GEMINI_API_KEY. Add it to your .env file.");
+}
+
+// The client gets the API key from the environment variable `GEMINI_API_KEY`.
+const ai = new GoogleGenAI({apiKey: geminiApiKey});
 
 app.use(express.json());
 
 const publicDir = path.join(__dirname, "..", "public");
 app.use(express.static(publicDir));
 
-app.post("/api/submit-url", (req, res) => {
+app.post("/api/submit-url", async (req, res) => {
   const { url } = req.body as { url?: string };
 
   if (!url || typeof url !== "string") {
     return res.status(400).json({ error: "Please provide a valid URL string." });
   }
 
-  return res.json({ message: "hello world" });
+  const response = await ai.models.generateContent({
+    model: "gemini-3-flash-preview",
+    contents: "Explain how AI works in a few words",
+  });
+  console.log(response.text);
+
+  return res.json({ message: response.text });
 });
 
 app.get("*", (_req, res) => {
