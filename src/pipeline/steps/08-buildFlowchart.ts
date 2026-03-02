@@ -16,10 +16,24 @@ function shorten(value: string, maxLength: number): string {
   return `${value.slice(0, Math.max(0, maxLength - 1)).trimEnd()}…`;
 }
 
-function buildActionLabel(stepNumber: number, actionText: string): string {
-  const cleaned = compactWhitespace(actionText.replace(/^[a-z]\d+\s*:\s*/i, ""));
-  const concise = shorten(cleaned, 48);
-  return `${stepNumber}. ${concise}`;
+function toImperativeVerb(value: string): string {
+  const cleaned = compactWhitespace(
+    value
+      .replace(/^[a-z]\d+\s*:\s*/i, "")
+      .replace(/[“”"'()[\]{}]/g, " "),
+  );
+
+  const firstWord = cleaned.match(/[a-z]+(?:-[a-z]+)*/i)?.[0];
+
+  if (!firstWord) {
+    return "Step";
+  }
+
+  return `${firstWord.charAt(0).toUpperCase()}${firstWord.slice(1).toLowerCase()}`;
+}
+
+function buildActionLabel(actionText: string): string {
+  return toImperativeVerb(actionText);
 }
 
 export function buildFlowchart(recipe: RecipeGraphData): RecipeGraphData {
@@ -31,7 +45,7 @@ export function buildFlowchart(recipe: RecipeGraphData): RecipeGraphData {
     recipe.actions.forEach((action, index) => {
       const mermaidId = `S${index + 1}`;
       actionNodeIdMap.set(action.id, mermaidId);
-      lines.push(`  ${mermaidId}[\"${escapeLabel(buildActionLabel(index + 1, action.action))}\"]`);
+      lines.push(`  ${mermaidId}[\"${escapeLabel(buildActionLabel(action.action))}\"]`);
     });
 
     let hasDependencyEdges = false;
