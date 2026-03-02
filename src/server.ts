@@ -26,10 +26,43 @@ app.post("/api/submit-url", async (req, res) => {
     return res.status(400).json({ error: "Please provide a valid URL string." });
   }
 
+  let parsedUrl: URL;
+  try {
+    parsedUrl = new URL(url);
+  } catch {
+    return res.status(400).json({ error: "Please provide a valid absolute URL." });
+  }
+
+  if (!["http:", "https:"].includes(parsedUrl.protocol)) {
+    return res.status(400).json({ error: "Only http and https URLs are supported." });
+  }
+
+  let html: string;
+  try {
+    const pageResponse = await fetch(parsedUrl.toString(), {
+      headers: {
+        "User-Agent": "recipe-viz/1.0",
+      },
+      signal: AbortSignal.timeout(15_000),
+    });
+
+    if (!pageResponse.ok) {
+      return res.status(400).json({ error: `Failed to fetch URL: ${pageResponse.status} ${pageResponse.statusText}` });
+    }
+
+    html = await pageResponse.text();
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Unknown error";
+    return res.status(400).json({ error: `Unable to fetch URL content: ${message}` });
+  }
+
+  console.log(html)
+
   const response = await ai.models.generateContent({
     model: "gemini-3-flash-preview",
-    contents: "Explain how AI works in a few words",
+    contents: `${parsedUrl.toString()}\n\n${html}`,
   });
+
   console.log(response.text);
 
   return res.json({ message: response.text });
