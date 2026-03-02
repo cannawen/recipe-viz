@@ -1,5 +1,5 @@
 import { GoogleGenAI } from "@google/genai";
-import type { IngredientExtractionResult } from "./types";
+import type { IngredientExtractionResult } from "../types";
 
 const MODEL_NAME = "gemini-3-flash-preview";
 

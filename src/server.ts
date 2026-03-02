@@ -2,7 +2,7 @@ import "dotenv/config";
 import express from "express";
 import path from "path";
 import { GoogleGenAI } from "@google/genai";
-import { processRecipeUrl, UrlValidationError } from "./pipeline/processRecipeUrl";
+import { processRecipeUrl, UrlValidationError } from "./pipeline/runSteps";
 
 const app = express();
 const port = process.env.PORT || 3000;

@@ -1,7 +1,7 @@
 import { GoogleGenAI } from "@google/genai";
-import { fetchHtml } from "./fetchHtml";
-import { htmlToText } from "./htmlToText";
-import { extractIngredients } from "./extractIngredients";
+import { fetchHtml } from "./steps/01-fetchHtml";
+import { htmlToText } from "./steps/02-htmlToText";
+import { extractIngredients } from "./steps/03-extractIngredients";
 import type { IngredientExtractionResult } from "./types";
 
 export class UrlValidationError extends Error {}
@@ -24,12 +24,8 @@ export function validateRecipeUrl(url: string): URL {
 
 export async function processRecipeUrl(ai: GoogleGenAI, url: string): Promise<IngredientExtractionResult> {
   const parsedUrl = validateRecipeUrl(url);
-  console.log(parsedUrl);
   const html = await fetchHtml(parsedUrl);
-  console.log(html);
   const text = htmlToText(html);
-  console.log(text);
   const ingredients = await extractIngredients(ai, parsedUrl.toString(), text);
-  console.log(ingredients)
-  return ingredients
+  return ingredients;
 }
