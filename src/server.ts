@@ -3,6 +3,7 @@ import express from "express";
 import path from "path";
 import { GoogleGenAI } from "@google/genai";
 import { processRecipeUrl, UrlValidationError } from "./pipeline/runSteps";
+import { getApiCacheFilePath } from "./pipeline/steps/shared";
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -46,4 +47,5 @@ app.get("*", (_req, res) => {
 
 app.listen(port, () => {
   console.log(`Server running on http://localhost:${port}`);
+  console.log(`API cache file: ${getApiCacheFilePath()}`);
 });

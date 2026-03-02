@@ -1,6 +1,6 @@
 import { GoogleGenAI } from "@google/genai";
 import type { EquipmentExtractionResult, Ingredient } from "../types";
-import { safeJsonParse } from "./shared";
+import { createApiCacheKey, readApiCache, safeJsonParse, writeApiCache } from "./shared";
 
 const MODEL_NAME = "gemini-3-flash-preview";
 
@@ -25,12 +25,17 @@ export async function extractEquipment(
     pageText.slice(0, 40_000),
   ].join("\n");
 
-  const response = await ai.models.generateContent({
+  const cacheKey = createApiCacheKey("extractEquipment", `${MODEL_NAME}\n${prompt}`);
+  const cachedText = await readApiCache(cacheKey);
+  const text = cachedText ?? (await ai.models.generateContent({
     model: MODEL_NAME,
     contents: prompt,
-  });
+  })).text ?? "";
 
-  const text = response.text ?? "";
+  if (!cachedText) {
+    await writeApiCache(cacheKey, text);
+  }
+
   const parsed = safeJsonParse<EquipmentExtractionResult>(text);
 
   return {
