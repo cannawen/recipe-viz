@@ -1,57 +1,71 @@
 ingredients:
-  - name: flour
+  - id: flour
     amount: 281
     units: g
-  - name: baking soda
+  - id: baking soda
     amount: 1
     units: tsp
-  - name: cornstarch
+  - id: cornstarch
     amount: 1.5
     units: tsp
-  - name: salt
+  - id: salt
     amount: 0.5
     units: tsp
-  - name: melted butter
+  - id: melted butter
     amount: 170
     units: g
-  - name: brown sugar
+  - id: brown sugar
     amount: 150
     units: g
-  - name: granulated sugar
+  - id: granulated sugar
     amount: 100
     units: g
-  - name: egg
+  - id: egg
     amount: 1
-  - name: egg yolk
+  - id: egg yolk
     amount: 1
-  - name: vanilla extract
+  - id: vanilla extract
     amount: 2
     units: tsp
-  - name: chocolate chips
+  - id: chocolate chips
     amount: 225
     units: g
-combinations:
-  dry ingredients:
-    - flour
-    - baking soda
-    - cornstarch
-    - salt
-  creamed butter:
+
+steps:
+  id: dry ingredients
+  whisk:
+      - flour
+      - baking soda
+      - cornstarch
+      - salt
+
+  id: creamed butter
+  cream:
     - melted butter
     - brown sugar
     - granulated sugar
-  wet ingredients:
+
+  id: wet ingredients
+  mix:
     - creamed butter
     - egg
     - egg yolk
     - vanilla extract
-  cookie dough:
+
+  id: cookie dough
+  mix:
     - dry ingredients
     - wet ingredients
     - chocolate chips
-  chilled cookie dough:
+
+  id: chilled cookie dough:
+  fridge:
     - cookie dough
-  uncooked cookies:
+
+  id: portioned cookie dough:
+  portion:
     - chilled cookie dough
-  cookies:
-    - uncooked cookies
+
+  id: cookies:
+  bake:
+    - portioned cookie dough

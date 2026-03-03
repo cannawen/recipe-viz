@@ -1,27 +1,25 @@
 import fs from "node:fs";
 import path from "node:path";
-import { parse } from "yaml";
-
-type Ingredient = {
-  name: string;
-  amount?: number;
-  units?: string;
-};
-
-type Recipe = {
-  ingredients: Ingredient[];
-  equipment?: string[];
-  steps: Record<string, string[]>;
-};
+import { isMap, isScalar, isSeq, parseDocument } from "yaml";
 
 const recipePath = path.join(__dirname, "..", "recipe.yml");
 const raw = fs.readFileSync(recipePath, "utf8");
-const parsed = parse(raw) as unknown;
+
+const normalizedRaw = raw.replace(
+  /^(\s*id:\s*)([^"'#\n][^#\n]*?):\s*$/gm,
+  (_match: string, prefix: string, value: string) => `${prefix}${value.trim()}`,
+);
+
+const doc = parseDocument(normalizedRaw, {
+  uniqueKeys: false,
+});
 
 const errors: string[] = [];
 
 const isNonEmptyString = (value: unknown): value is string =>
   typeof value === "string" && value.trim().length > 0;
+
+const normalizeId = (value: string): string => value.trim().replace(/:+$/, "");
 
 const asObject = (value: unknown): Record<string, unknown> | null => {
   if (value && typeof value === "object" && !Array.isArray(value)) {
@@ -31,18 +29,41 @@ const asObject = (value: unknown): Record<string, unknown> | null => {
   return null;
 };
 
+if (doc.errors.length > 0) {
+  for (const error of doc.errors) {
+    errors.push(`YAML parse error: ${error.message}`);
+  }
+
+  console.error("Recipe validation failed:");
+  for (const error of errors) {
+    console.error(`- ${error}`);
+  }
+  process.exit(1);
+}
+
+const parsed = doc.toJS() as unknown;
+
 const recipeObj = asObject(parsed);
 if (!recipeObj) {
   errors.push("Recipe root must be an object.");
 }
 
 const ingredientsValue = recipeObj?.ingredients;
-const equipmentValue = recipeObj?.equipment;
-const stepsValue = recipeObj?.steps;
+
+const rootNode = doc.contents;
+const stepsNode =
+  isMap(rootNode) && rootNode.get("steps", true) ? rootNode.get("steps", true) : null;
 
 const ingredientNames = new Set<string>();
-const equipmentNames = new Set<string>();
 const stepNames = new Set<string>();
+
+type ParsedStep = {
+  id: string;
+  action: string;
+  dependencies: string[];
+};
+
+const parsedSteps: ParsedStep[] = [];
 
 if (!Array.isArray(ingredientsValue) || ingredientsValue.length === 0) {
   errors.push("ingredients must be a non-empty array.");
@@ -55,12 +76,12 @@ if (!Array.isArray(ingredientsValue) || ingredientsValue.length === 0) {
       continue;
     }
 
-    if (!isNonEmptyString(ingredient.name)) {
-      errors.push(`ingredients[${index}].name must be a non-empty string.`);
+    if (!isNonEmptyString(ingredient.id)) {
+      errors.push(`ingredients[${index}].id must be a non-empty string.`);
       continue;
     }
 
-    ingredientNames.add(ingredient.name);
+    ingredientNames.add(normalizeId(ingredient.id));
 
     if (
       Object.prototype.hasOwnProperty.call(ingredient, "amount") &&
@@ -78,54 +99,78 @@ if (!Array.isArray(ingredientsValue) || ingredientsValue.length === 0) {
   }
 }
 
-if (equipmentValue !== undefined) {
-  if (!Array.isArray(equipmentValue)) {
-    errors.push("equipment must be an array of strings when present.");
-  } else {
-    for (let index = 0; index < equipmentValue.length; index += 1) {
-      const item = equipmentValue[index];
-      if (!isNonEmptyString(item)) {
-        errors.push(`equipment[${index}] must be a non-empty string.`);
+if (!stepsNode || !isMap(stepsNode) || stepsNode.items.length === 0) {
+  errors.push("steps must be a non-empty map of repeated id + action entries.");
+} else {
+  if (stepsNode.items.length % 2 !== 0) {
+    errors.push("steps entries must come in pairs: `id:` followed by one action key.");
+  }
+
+  for (let index = 0; index + 1 < stepsNode.items.length; index += 2) {
+    const idPair = stepsNode.items[index];
+    const actionPair = stepsNode.items[index + 1];
+
+    const idKey = isScalar(idPair.key) ? String(idPair.key.value) : "";
+    if (idKey !== "id") {
+      errors.push(
+        `steps pair starting at index ${index} must begin with key \`id\` (found \`${idKey || "<non-scalar>"}\`).`,
+      );
+      continue;
+    }
+
+    const rawStepId = isScalar(idPair.value) ? String(idPair.value.value ?? "") : "";
+    const stepId = normalizeId(rawStepId);
+    if (!isNonEmptyString(stepId)) {
+      errors.push(`steps id at pair index ${index} must be a non-empty string.`);
+      continue;
+    }
+
+    if (stepNames.has(stepId)) {
+      errors.push(`Duplicate step id: \`${stepId}\`.`);
+    }
+    stepNames.add(stepId);
+
+    const action = isScalar(actionPair.key) ? String(actionPair.key.value) : "";
+    if (!isNonEmptyString(action) || action === "id") {
+      errors.push(`steps action for \`${stepId}\` must be a non-empty key other than \`id\`.`);
+      continue;
+    }
+
+    const valueNode = actionPair.value;
+    if (!isSeq(valueNode) || valueNode.items.length === 0) {
+      errors.push(`steps action \`${action}\` for \`${stepId}\` must be a non-empty array.`);
+      continue;
+    }
+
+    const dependencies: string[] = [];
+    for (let depIndex = 0; depIndex < valueNode.items.length; depIndex += 1) {
+      const item = valueNode.items[depIndex];
+      if (!isScalar(item) || !isNonEmptyString(item.value)) {
+        errors.push(`steps.${stepId}.${action}[${depIndex}] must be a non-empty string.`);
         continue;
       }
-      equipmentNames.add(item);
+
+      dependencies.push(normalizeId(String(item.value)));
     }
+
+    parsedSteps.push({
+      id: stepId,
+      action,
+      dependencies,
+    });
   }
 }
 
-const stepsObj = asObject(stepsValue);
-if (!stepsObj || Object.keys(stepsObj).length === 0) {
-  errors.push("steps must be a non-empty object.");
-} else {
-  for (const key of Object.keys(stepsObj)) {
-    if (!isNonEmptyString(key)) {
-      errors.push("step keys must be non-empty strings.");
-      continue;
-    }
-    stepNames.add(key);
-  }
+for (const step of parsedSteps) {
+  for (let index = 0; index < step.dependencies.length; index += 1) {
+    const dep = step.dependencies[index];
 
-  for (const [stepName, dependencies] of Object.entries(stepsObj)) {
-    if (!Array.isArray(dependencies) || dependencies.length === 0) {
-      errors.push(`steps.${stepName} must be a non-empty array of strings.`);
-      continue;
-    }
+    const isKnown = ingredientNames.has(dep) || stepNames.has(dep);
 
-    for (let index = 0; index < dependencies.length; index += 1) {
-      const dep = dependencies[index];
-      if (!isNonEmptyString(dep)) {
-        errors.push(`steps.${stepName}[${index}] must be a non-empty string.`);
-        continue;
-      }
-
-      const isKnown =
-        ingredientNames.has(dep) || equipmentNames.has(dep) || stepNames.has(dep);
-
-      if (!isKnown) {
-        errors.push(
-          `steps.${stepName}[${index}] = \"${dep}\" is unknown. Expected ingredient, equipment, or step key.`,
-        );
-      }
+    if (!isKnown) {
+      errors.push(
+        `steps.${step.id}.${step.action}[${index}] = "${dep}" is unknown. Expected ingredient id or step id.`,
+      );
     }
   }
 }
