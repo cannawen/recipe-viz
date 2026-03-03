@@ -54,6 +54,7 @@ function buildMermaidFromRecipeYaml(rawYaml: string): string {
   const lines: string[] = ["flowchart LR"];
   const ingredientNodeByName = new Map<string, string>();
   const stepNodeByName = new Map<string, string>();
+  const ingredientNodeDefinitions: string[] = [];
 
   const ingredients = Array.isArray(parsed.ingredients) ? parsed.ingredients : [];
   for (const ingredient of ingredients) {
@@ -70,7 +71,14 @@ function buildMermaidFromRecipeYaml(rawYaml: string): string {
     const label = [amountText, unitsText, ingredientName].filter(Boolean).join(" ");
 
     ingredientNodeByName.set(ingredientName, nodeId);
-    lines.push(`  ${nodeId}["${escapeMermaidLabel(label)}"]`);
+    ingredientNodeDefinitions.push(`    ${nodeId}["${escapeMermaidLabel(label)}"]`);
+  }
+
+  if (ingredientNodeDefinitions.length > 0) {
+    lines.push("  subgraph ingredients[Ingredients]");
+    lines.push("    direction TB");
+    lines.push(...ingredientNodeDefinitions);
+    lines.push("  end");
   }
 
   const rootNode = doc.contents;
