@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Recipe Graph</title>
+    <script src="https://unpkg.com/cytoscape@3.30.2/dist/cytoscape.min.js"></script>
+    <style>
+      html,
+      body {
+        margin: 0;
+        width: 100%;
+        height: 100%;
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      }
+
+      #cy {
+        width: 100%;
+        height: calc(100% - 36px);
+      }
+
+      #status {
+        height: 36px;
+        line-height: 36px;
+        padding: 0 12px;
+        border-top: 1px solid #e5e7eb;
+        background: #f9fafb;
+        color: #111827;
+        font-size: 14px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="cy"></div>
+    <div id="status">Loading graph…</div>
+
+    <script>
+      const statusEl = document.getElementById("status");
+
+      function normalizeElements(payload) {
+        if (!payload) return [];
+
+        if (Array.isArray(payload)) return payload;
+
+        if (payload.elements && Array.isArray(payload.elements)) {
+          return payload.elements;
+        }
+
+        if (
+          payload.elements &&
+          Array.isArray(payload.elements.nodes) &&
+          Array.isArray(payload.elements.edges)
+        ) {
+          return [...payload.elements.nodes, ...payload.elements.edges];
+        }
+
+        if (Array.isArray(payload.nodes) && Array.isArray(payload.edges)) {
+          return [...payload.nodes, ...payload.edges];
+        }
+
+        throw new Error("Unsupported Cytoscape JSON format");
+      }
+
+      async function loadGraph() {
+        const response = await fetch("/cytoscape.json", { cache: "no-store" });
+        if (!response.ok) {
+          throw new Error(`Failed to load /cytoscape.json (${response.status})`);
+        }
+
+        const payload = await response.json();
+        const elements = normalizeElements(payload);
+
+        if (!elements.length) {
+          throw new Error("No nodes/edges found in cytoscape.json");
+        }
+
+        cytoscape({
+          container: document.getElementById("cy"),
+          elements,
+          style: [
+            {
+              selector: "node",
+              style: {
+                "background-color": "#2563eb",
+                label: "data(label)",
+                color: "#111827",
+                "text-background-color": "#ffffff",
+                "text-background-opacity": 0.8,
+                "text-background-padding": "2px",
+                "font-size": "10px",
+                width: "16px",
+                height: "16px"
+              }
+            },
+            {
+              selector: "edge",
+              style: {
+                width: 2,
+                "line-color": "#9ca3af",
+                "target-arrow-color": "#9ca3af",
+                "target-arrow-shape": "triangle",
+                "curve-style": "bezier"
+              }
+            }
+          ],
+          layout: {
+            name: "cose",
+            animate: false,
+            fit: true,
+            padding: 24
+          }
+        });
+
+        statusEl.textContent = `Loaded ${elements.length} graph elements from /cytoscape.json`;
+      }
+
+      loadGraph().catch((error) => {
+        console.error(error);
+        statusEl.textContent = error.message || "Failed to render graph";
+      });
+    </script>
+  </body>
+</html>

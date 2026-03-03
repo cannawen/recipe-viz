@@ -19,6 +19,10 @@ app.use(express.json());
 const publicDir = path.join(__dirname, "..", "public");
 app.use(express.static(publicDir));
 
+app.get("/cytoscape.json", (_req, res) => {
+  res.sendFile(path.join(__dirname, "..", "cytoscape.json"));
+});
+
 app.post("/api/submit-url", async (req, res) => {
   const { url } = req.body as { url?: string };
 
