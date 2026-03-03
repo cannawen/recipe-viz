@@ -1,0 +1,1222 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>URL Submit Demo</title>
+    <style>
+      body {
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        max-width: 680px;
+        margin: 40px auto;
+        padding: 0 16px;
+      }
+      form {
+        display: flex;
+        gap: 8px;
+      }
+      input {
+        flex: 1;
+        padding: 8px;
+      }
+      button {
+        padding: 8px 14px;
+      }
+      #result {
+        margin-top: 16px;
+        font-weight: 600;
+      }
+      #json-output {
+        margin-top: 12px;
+        padding: 12px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        font-size: 12px;
+        white-space: pre-wrap;
+        word-break: break-word;
+      }
+      #flowchart {
+        margin-top: 16px;
+        overflow: auto;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Submit URL</h1>
+    <form id="url-form">
+      <input id="url-input" type="url" placeholder="https://example.com" required="" value="https://sallysbakingaddiction.com/chewy-chocolate-chip-cookies/print/70437/">
+      <button type="submit">Send</button>
+    </form>
+    <p id="result">Recipe graph generated.</p>
+    <pre id="json-output">{
+  "sourceUrl": "https://sallysbakingaddiction.com/chewy-chocolate-chip-cookies/print/70437/",
+  "title": "Chewy Chocolate Chip Cookies",
+  "ingredients": [
+    {
+      "name": "all-purpose flour",
+      "quantity": "2 1/4",
+      "unit": "cups",
+      "notes": "281g; spooned &amp; leveled"
+    },
+    {
+      "name": "baking soda",
+      "quantity": "1",
+      "unit": "teaspoon",
+      "notes": null
+    },
+    {
+      "name": "cornstarch",
+      "quantity": "1 1/2",
+      "unit": "teaspoons",
+      "notes": null
+    },
+    {
+      "name": "salt",
+      "quantity": "1/2",
+      "unit": "teaspoon",
+      "notes": null
+    },
+    {
+      "name": "unsalted butter",
+      "quantity": "3/4",
+      "unit": "cup",
+      "notes": "170g / 12 Tbsp; melted &amp; cooled for 5 minutes"
+    },
+    {
+      "name": "light or dark brown sugar",
+      "quantity": "3/4",
+      "unit": "cup",
+      "notes": "150g; packed"
+    },
+    {
+      "name": "granulated sugar",
+      "quantity": "1/2",
+      "unit": "cup",
+      "notes": "100g"
+    },
+    {
+      "name": "large egg + 1 egg yolk",
+      "quantity": "1",
+      "unit": null,
+      "notes": "at room temperature"
+    },
+    {
+      "name": "pure vanilla extract",
+      "quantity": "2",
+      "unit": "teaspoons",
+      "notes": null
+    },
+    {
+      "name": "semi-sweet chocolate chips or chocolate chunks",
+      "quantity": "1 1/4",
+      "unit": "cups",
+      "notes": "225g"
+    }
+  ],
+  "equipment": [
+    {
+      "name": "large bowl",
+      "notes": "Used for whisking dry ingredients."
+    },
+    {
+      "name": "whisk",
+      "notes": "Used for combining dry ingredients and wet ingredients."
+    },
+    {
+      "name": "medium bowl",
+      "notes": "Used for whisking melted butter and sugars."
+    },
+    {
+      "name": "large spoon",
+      "notes": "Used to mix dry and wet ingredients together."
+    },
+    {
+      "name": "spatula",
+      "notes": "Used to mix dough and fold in chocolate chips."
+    },
+    {
+      "name": "oven",
+      "notes": "Preheat to 325°F (163°C)."
+    },
+    {
+      "name": "large baking sheets",
+      "notes": "Used for baking the cookies."
+    },
+    {
+      "name": "parchment paper",
+      "notes": "Used to line baking sheets."
+    },
+    {
+      "name": "silicone baking mats",
+      "notes": "Alternative to parchment paper for lining baking sheets."
+    },
+    {
+      "name": "cookie scoop",
+      "notes": "Used to portion dough (about 3 Tablespoons for XL, 2 for medium)."
+    },
+    {
+      "name": "Tablespoon measuring spoon",
+      "notes": "Alternative to a cookie scoop for portioning dough."
+    },
+    {
+      "name": "cooling rack",
+      "notes": "Used for cooling cookies completely."
+    }
+  ],
+  "ingredientEquipmentLinks": [
+    {
+      "ingredientName": "all-purpose flour",
+      "equipmentName": "large bowl",
+      "action": "whisk together",
+      "stepText": "In a large bowl, whisk the flour, baking soda, cornstarch, and salt together."
+    },
+    {
+      "ingredientName": "baking soda",
+      "equipmentName": "large bowl",
+      "action": "whisk together",
+      "stepText": "In a large bowl, whisk the flour, baking soda, cornstarch, and salt together."
+    },
+    {
+      "ingredientName": "cornstarch",
+      "equipmentName": "large bowl",
+      "action": "whisk together",
+      "stepText": "In a large bowl, whisk the flour, baking soda, cornstarch, and salt together."
+    },
+    {
+      "ingredientName": "salt",
+      "equipmentName": "large bowl",
+      "action": "whisk together",
+      "stepText": "In a large bowl, whisk the flour, baking soda, cornstarch, and salt together."
+    },
+    {
+      "ingredientName": "all-purpose flour",
+      "equipmentName": "whisk",
+      "action": "whisk together",
+      "stepText": "In a large bowl, whisk the flour, baking soda, cornstarch, and salt together."
+    },
+    {
+      "ingredientName": "baking soda",
+      "equipmentName": "whisk",
+      "action": "whisk together",
+      "stepText": "In a large bowl, whisk the flour, baking soda, cornstarch, and salt together."
+    },
+    {
+      "ingredientName": "cornstarch",
+      "equipmentName": "whisk",
+      "action": "whisk together",
+      "stepText": "In a large bowl, whisk the flour, baking soda, cornstarch, and salt together."
+    },
+    {
+      "ingredientName": "salt",
+      "equipmentName": "whisk",
+      "action": "whisk together",
+      "stepText": "In a large bowl, whisk the flour, baking soda, cornstarch, and salt together."
+    },
+    {
+      "ingredientName": "unsalted butter",
+      "equipmentName": "medium bowl",
+      "action": "whisk together",
+      "stepText": "In a medium bowl, whisk the melted butter, brown sugar, and granulated sugar together until no lumps remain."
+    },
+    {
+      "ingredientName": "light or dark brown sugar",
+      "equipmentName": "medium bowl",
+      "action": "whisk together",
+      "stepText": "In a medium bowl, whisk the melted butter, brown sugar, and granulated sugar together until no lumps remain."
+    },
+    {
+      "ingredientName": "granulated sugar",
+      "equipmentName": "medium bowl",
+      "action": "whisk together",
+      "stepText": "In a medium bowl, whisk the melted butter, brown sugar, and granulated sugar together until no lumps remain."
+    },
+    {
+      "ingredientName": "unsalted butter",
+      "equipmentName": "whisk",
+      "action": "whisk together",
+      "stepText": "In a medium bowl, whisk the melted butter, brown sugar, and granulated sugar together until no lumps remain."
+    },
+    {
+      "ingredientName": "light or dark brown sugar",
+      "equipmentName": "whisk",
+      "action": "whisk together",
+      "stepText": "In a medium bowl, whisk the melted butter, brown sugar, and granulated sugar together until no lumps remain."
+    },
+    {
+      "ingredientName": "granulated sugar",
+      "equipmentName": "whisk",
+      "action": "whisk together",
+      "stepText": "In a medium bowl, whisk the melted butter, brown sugar, and granulated sugar together until no lumps remain."
+    },
+    {
+      "ingredientName": "large egg + 1 egg yolk",
+      "equipmentName": "medium bowl",
+      "action": "whisk in",
+      "stepText": "Whisk in the egg and egg yolk until combined"
+    },
+    {
+      "ingredientName": "large egg + 1 egg yolk",
+      "equipmentName": "whisk",
+      "action": "whisk in",
+      "stepText": "Whisk in the egg and egg yolk until combined"
+    },
+    {
+      "ingredientName": "pure vanilla extract",
+      "equipmentName": "medium bowl",
+      "action": "whisk in",
+      "stepText": "then whisk in the vanilla extract."
+    },
+    {
+      "ingredientName": "pure vanilla extract",
+      "equipmentName": "whisk",
+      "action": "whisk in",
+      "stepText": "then whisk in the vanilla extract."
+    },
+    {
+      "ingredientName": "unsalted butter",
+      "equipmentName": "large bowl",
+      "action": "pour into",
+      "stepText": "Pour into dry ingredients and mix together with a large spoon or spatula."
+    },
+    {
+      "ingredientName": "all-purpose flour",
+      "equipmentName": "large spoon",
+      "action": "mix together",
+      "stepText": "Pour into dry ingredients and mix together with a large spoon or spatula."
+    },
+    {
+      "ingredientName": "all-purpose flour",
+      "equipmentName": "spatula",
+      "action": "mix together",
+      "stepText": "Pour into dry ingredients and mix together with a large spoon or spatula."
+    },
+    {
+      "ingredientName": "semi-sweet chocolate chips or chocolate chunks",
+      "equipmentName": "large bowl",
+      "action": "fold in",
+      "stepText": "Fold in the chocolate chips."
+    },
+    {
+      "ingredientName": "semi-sweet chocolate chips or chocolate chunks",
+      "equipmentName": "spatula",
+      "action": "fold in",
+      "stepText": "Fold in the chocolate chips."
+    },
+    {
+      "ingredientName": "all-purpose flour",
+      "equipmentName": "cookie scoop",
+      "action": "scoop",
+      "stepText": "Using a cookie scoop or Tablespoon measuring spoon, scoop the chilled cookie dough"
+    },
+    {
+      "ingredientName": "all-purpose flour",
+      "equipmentName": "Tablespoon measuring spoon",
+      "action": "scoop",
+      "stepText": "Using a cookie scoop or Tablespoon measuring spoon, scoop the chilled cookie dough"
+    },
+    {
+      "ingredientName": "all-purpose flour",
+      "equipmentName": "large baking sheets",
+      "action": "arrange",
+      "stepText": "Arrange the cookies 3 inches apart on the prepared baking sheets."
+    },
+    {
+      "ingredientName": "all-purpose flour",
+      "equipmentName": "parchment paper",
+      "action": "line",
+      "stepText": "Line large baking sheets with parchment paper or silicone baking mats."
+    },
+    {
+      "ingredientName": "all-purpose flour",
+      "equipmentName": "silicone baking mats",
+      "action": "line",
+      "stepText": "Line large baking sheets with parchment paper or silicone baking mats."
+    },
+    {
+      "ingredientName": "all-purpose flour",
+      "equipmentName": "oven",
+      "action": "bake",
+      "stepText": "Bake the cookies for 13–14 minutes or until the edges are very lightly browned."
+    },
+    {
+      "ingredientName": "all-purpose flour",
+      "equipmentName": "cooling rack",
+      "action": "transfer",
+      "stepText": "Cool on the baking sheet for 10 minutes before transferring to a cooling rack to cool completely."
+    },
+    {
+      "ingredientName": "semi-sweet chocolate chips or chocolate chunks",
+      "equipmentName": "large baking sheets",
+      "action": "press into",
+      "stepText": "While the cookies are still warm, I like to press a few more chocolate chips into the tops"
+    }
+  ],
+  "actions": [
+    {
+      "id": "a1",
+      "action": "Whisk dry ingredients",
+      "description": "In a large bowl, whisk the flour, baking soda, cornstarch, and salt together. Set aside.",
+      "equipment": [
+        "large bowl",
+        "whisk"
+      ],
+      "ingredients": [
+        "all-purpose flour",
+        "baking soda",
+        "cornstarch",
+        "salt"
+      ],
+      "dependsOn": []
+    },
+    {
+      "id": "a2",
+      "action": "Whisk butter and sugars",
+      "description": "In a medium bowl, whisk the melted butter, brown sugar, and granulated sugar together until no lumps remain.",
+      "equipment": [
+        "medium bowl",
+        "whisk"
+      ],
+      "ingredients": [
+        "unsalted butter",
+        "light or dark brown sugar",
+        "granulated sugar"
+      ],
+      "dependsOn": []
+    },
+    {
+      "id": "a3",
+      "action": "Add egg and vanilla",
+      "description": "Whisk in the egg and egg yolk until combined, then whisk in the vanilla extract.",
+      "equipment": [
+        "medium bowl",
+        "whisk"
+      ],
+      "ingredients": [
+        "large egg + 1 egg yolk",
+        "pure vanilla extract"
+      ],
+      "dependsOn": [
+        "a2"
+      ]
+    },
+    {
+      "id": "a4",
+      "action": "Combine wet and dry ingredients",
+      "description": "Pour the wet mixture into the dry ingredients and mix together with a large spoon or spatula until a soft, thick, and shiny dough forms.",
+      "equipment": [
+        "large bowl",
+        "large spoon",
+        "spatula"
+      ],
+      "ingredients": [],
+      "dependsOn": [
+        "a1",
+        "a3"
+      ]
+    },
+    {
+      "id": "a5",
+      "action": "Fold in chocolate chips",
+      "description": "Fold in the chocolate chips, doing your best to combine them even if they do not stick easily due to the melted butter.",
+      "equipment": [
+        "spatula"
+      ],
+      "ingredients": [
+        "semi-sweet chocolate chips or chocolate chunks"
+      ],
+      "dependsOn": [
+        "a4"
+      ]
+    },
+    {
+      "id": "a6",
+      "action": "Chill the dough",
+      "description": "Cover the dough tightly and refrigerate for at least 2 hours or up to 3 days (overnight recommended).",
+      "equipment": [
+        "large bowl"
+      ],
+      "ingredients": [],
+      "dependsOn": [
+        "a5"
+      ]
+    },
+    {
+      "id": "a7",
+      "action": "Prepare oven and baking sheets",
+      "description": "Preheat oven to 325°F (163°C). Line large baking sheets with parchment paper or silicone baking mats.",
+      "equipment": [
+        "oven",
+        "large baking sheets",
+        "parchment paper",
+        "silicone baking mats"
+      ],
+      "ingredients": [],
+      "dependsOn": []
+    },
+    {
+      "id": "a8",
+      "action": "Temper the dough",
+      "description": "If the dough has chilled for longer than 2 hours, let it sit at room temperature for about 15 minutes before shaping.",
+      "equipment": [],
+      "ingredients": [],
+      "dependsOn": [
+        "a6",
+        "a7"
+      ]
+    },
+    {
+      "id": "a9",
+      "action": "Shape the dough",
+      "description": "Scoop dough (3 Tablespoons for XL, 2 Tablespoons for medium). Roll into a ball and shape with fingers to be taller than wide, like a cylinder.",
+      "equipment": [
+        "cookie scoop",
+        "Tablespoon measuring spoon"
+      ],
+      "ingredients": [],
+      "dependsOn": [
+        "a8"
+      ]
+    },
+    {
+      "id": "a10",
+      "action": "Bake the cookies",
+      "description": "Arrange cookies 3 inches apart on sheets. Bake for 13–14 minutes until edges are lightly browned.",
+      "equipment": [
+        "oven",
+        "large baking sheets"
+      ],
+      "ingredients": [],
+      "dependsOn": [
+        "a9"
+      ]
+    },
+    {
+      "id": "a11",
+      "action": "Cool the cookies",
+      "description": "Cool on the baking sheet for 10 minutes, then transfer to a cooling rack to cool completely.",
+      "equipment": [
+        "large baking sheets",
+        "cooling rack"
+      ],
+      "ingredients": [],
+      "dependsOn": [
+        "a10"
+      ]
+    },
+    {
+      "id": "a12",
+      "action": "Add extra chips (optional)",
+      "description": "While cookies are still warm, press a few more chocolate chips into the tops for appearance.",
+      "equipment": [],
+      "ingredients": [
+        "semi-sweet chocolate chips or chocolate chunks"
+      ],
+      "dependsOn": [
+        "a11"
+      ]
+    }
+  ],
+  "graph": {
+    "nodes": [
+      {
+        "id": "ingredient_all_purpose_flour",
+        "label": "all-purpose flour",
+        "type": "ingredient"
+      },
+      {
+        "id": "ingredient_baking_soda",
+        "label": "baking soda",
+        "type": "ingredient"
+      },
+      {
+        "id": "ingredient_cornstarch",
+        "label": "cornstarch",
+        "type": "ingredient"
+      },
+      {
+        "id": "ingredient_salt",
+        "label": "salt",
+        "type": "ingredient"
+      },
+      {
+        "id": "ingredient_unsalted_butter",
+        "label": "unsalted butter",
+        "type": "ingredient"
+      },
+      {
+        "id": "ingredient_light_or_dark_brown_sugar",
+        "label": "light or dark brown sugar",
+        "type": "ingredient"
+      },
+      {
+        "id": "ingredient_granulated_sugar",
+        "label": "granulated sugar",
+        "type": "ingredient"
+      },
+      {
+        "id": "ingredient_large_egg_1_egg_yolk",
+        "label": "large egg + 1 egg yolk",
+        "type": "ingredient"
+      },
+      {
+        "id": "ingredient_pure_vanilla_extract",
+        "label": "pure vanilla extract",
+        "type": "ingredient"
+      },
+      {
+        "id": "ingredient_semi_sweet_chocolate_chips_or_chocolate_chunks",
+        "label": "semi-sweet chocolate chips or chocolate chunks",
+        "type": "ingredient"
+      },
+      {
+        "id": "equipment_large_bowl",
+        "label": "large bowl",
+        "type": "equipment"
+      },
+      {
+        "id": "equipment_whisk",
+        "label": "whisk",
+        "type": "equipment"
+      },
+      {
+        "id": "equipment_medium_bowl",
+        "label": "medium bowl",
+        "type": "equipment"
+      },
+      {
+        "id": "equipment_large_spoon",
+        "label": "large spoon",
+        "type": "equipment"
+      },
+      {
+        "id": "equipment_spatula",
+        "label": "spatula",
+        "type": "equipment"
+      },
+      {
+        "id": "equipment_oven",
+        "label": "oven",
+        "type": "equipment"
+      },
+      {
+        "id": "equipment_large_baking_sheets",
+        "label": "large baking sheets",
+        "type": "equipment"
+      },
+      {
+        "id": "equipment_parchment_paper",
+        "label": "parchment paper",
+        "type": "equipment"
+      },
+      {
+        "id": "equipment_silicone_baking_mats",
+        "label": "silicone baking mats",
+        "type": "equipment"
+      },
+      {
+        "id": "equipment_cookie_scoop",
+        "label": "cookie scoop",
+        "type": "equipment"
+      },
+      {
+        "id": "equipment_tablespoon_measuring_spoon",
+        "label": "Tablespoon measuring spoon",
+        "type": "equipment"
+      },
+      {
+        "id": "equipment_cooling_rack",
+        "label": "cooling rack",
+        "type": "equipment"
+      },
+      {
+        "id": "action_a1",
+        "label": "a1: Whisk dry ingredients",
+        "type": "action"
+      },
+      {
+        "id": "action_a2",
+        "label": "a2: Whisk butter and sugars",
+        "type": "action"
+      },
+      {
+        "id": "action_a3",
+        "label": "a3: Add egg and vanilla",
+        "type": "action"
+      },
+      {
+        "id": "action_a4",
+        "label": "a4: Combine wet and dry ingredients",
+        "type": "action"
+      },
+      {
+        "id": "action_a5",
+        "label": "a5: Fold in chocolate chips",
+        "type": "action"
+      },
+      {
+        "id": "action_a6",
+        "label": "a6: Chill the dough",
+        "type": "action"
+      },
+      {
+        "id": "action_a7",
+        "label": "a7: Prepare oven and baking sheets",
+        "type": "action"
+      },
+      {
+        "id": "action_a8",
+        "label": "a8: Temper the dough",
+        "type": "action"
+      },
+      {
+        "id": "action_a9",
+        "label": "a9: Shape the dough",
+        "type": "action"
+      },
+      {
+        "id": "action_a10",
+        "label": "a10: Bake the cookies",
+        "type": "action"
+      },
+      {
+        "id": "action_a11",
+        "label": "a11: Cool the cookies",
+        "type": "action"
+      },
+      {
+        "id": "action_a12",
+        "label": "a12: Add extra chips (optional)",
+        "type": "action"
+      }
+    ],
+    "edges": [
+      {
+        "from": "ingredient_all_purpose_flour",
+        "to": "equipment_large_bowl",
+        "label": "whisk together"
+      },
+      {
+        "from": "ingredient_baking_soda",
+        "to": "equipment_large_bowl",
+        "label": "whisk together"
+      },
+      {
+        "from": "ingredient_cornstarch",
+        "to": "equipment_large_bowl",
+        "label": "whisk together"
+      },
+      {
+        "from": "ingredient_salt",
+        "to": "equipment_large_bowl",
+        "label": "whisk together"
+      },
+      {
+        "from": "ingredient_all_purpose_flour",
+        "to": "equipment_whisk",
+        "label": "whisk together"
+      },
+      {
+        "from": "ingredient_baking_soda",
+        "to": "equipment_whisk",
+        "label": "whisk together"
+      },
+      {
+        "from": "ingredient_cornstarch",
+        "to": "equipment_whisk",
+        "label": "whisk together"
+      },
+      {
+        "from": "ingredient_salt",
+        "to": "equipment_whisk",
+        "label": "whisk together"
+      },
+      {
+        "from": "ingredient_unsalted_butter",
+        "to": "equipment_medium_bowl",
+        "label": "whisk together"
+      },
+      {
+        "from": "ingredient_light_or_dark_brown_sugar",
+        "to": "equipment_medium_bowl",
+        "label": "whisk together"
+      },
+      {
+        "from": "ingredient_granulated_sugar",
+        "to": "equipment_medium_bowl",
+        "label": "whisk together"
+      },
+      {
+        "from": "ingredient_unsalted_butter",
+        "to": "equipment_whisk",
+        "label": "whisk together"
+      },
+      {
+        "from": "ingredient_light_or_dark_brown_sugar",
+        "to": "equipment_whisk",
+        "label": "whisk together"
+      },
+      {
+        "from": "ingredient_granulated_sugar",
+        "to": "equipment_whisk",
+        "label": "whisk together"
+      },
+      {
+        "from": "ingredient_large_egg_1_egg_yolk",
+        "to": "equipment_medium_bowl",
+        "label": "whisk in"
+      },
+      {
+        "from": "ingredient_large_egg_1_egg_yolk",
+        "to": "equipment_whisk",
+        "label": "whisk in"
+      },
+      {
+        "from": "ingredient_pure_vanilla_extract",
+        "to": "equipment_medium_bowl",
+        "label": "whisk in"
+      },
+      {
+        "from": "ingredient_pure_vanilla_extract",
+        "to": "equipment_whisk",
+        "label": "whisk in"
+      },
+      {
+        "from": "ingredient_unsalted_butter",
+        "to": "equipment_large_bowl",
+        "label": "pour into"
+      },
+      {
+        "from": "ingredient_all_purpose_flour",
+        "to": "equipment_large_spoon",
+        "label": "mix together"
+      },
+      {
+        "from": "ingredient_all_purpose_flour",
+        "to": "equipment_spatula",
+        "label": "mix together"
+      },
+      {
+        "from": "ingredient_semi_sweet_chocolate_chips_or_chocolate_chunks",
+        "to": "equipment_large_bowl",
+        "label": "fold in"
+      },
+      {
+        "from": "ingredient_semi_sweet_chocolate_chips_or_chocolate_chunks",
+        "to": "equipment_spatula",
+        "label": "fold in"
+      },
+      {
+        "from": "ingredient_all_purpose_flour",
+        "to": "equipment_cookie_scoop",
+        "label": "scoop"
+      },
+      {
+        "from": "ingredient_all_purpose_flour",
+        "to": "equipment_tablespoon_measuring_spoon",
+        "label": "scoop"
+      },
+      {
+        "from": "ingredient_all_purpose_flour",
+        "to": "equipment_large_baking_sheets",
+        "label": "arrange"
+      },
+      {
+        "from": "ingredient_all_purpose_flour",
+        "to": "equipment_parchment_paper",
+        "label": "line"
+      },
+      {
+        "from": "ingredient_all_purpose_flour",
+        "to": "equipment_silicone_baking_mats",
+        "label": "line"
+      },
+      {
+        "from": "ingredient_all_purpose_flour",
+        "to": "equipment_oven",
+        "label": "bake"
+      },
+      {
+        "from": "ingredient_all_purpose_flour",
+        "to": "equipment_cooling_rack",
+        "label": "transfer"
+      },
+      {
+        "from": "ingredient_semi_sweet_chocolate_chips_or_chocolate_chunks",
+        "to": "equipment_large_baking_sheets",
+        "label": "press into"
+      },
+      {
+        "from": "ingredient_all_purpose_flour",
+        "to": "action_a1",
+        "label": "input"
+      },
+      {
+        "from": "ingredient_baking_soda",
+        "to": "action_a1",
+        "label": "input"
+      },
+      {
+        "from": "ingredient_cornstarch",
+        "to": "action_a1",
+        "label": "input"
+      },
+      {
+        "from": "ingredient_salt",
+        "to": "action_a1",
+        "label": "input"
+      },
+      {
+        "from": "equipment_large_bowl",
+        "to": "action_a1",
+        "label": "tool"
+      },
+      {
+        "from": "equipment_whisk",
+        "to": "action_a1",
+        "label": "tool"
+      },
+      {
+        "from": "ingredient_unsalted_butter",
+        "to": "action_a2",
+        "label": "input"
+      },
+      {
+        "from": "ingredient_light_or_dark_brown_sugar",
+        "to": "action_a2",
+        "label": "input"
+      },
+      {
+        "from": "ingredient_granulated_sugar",
+        "to": "action_a2",
+        "label": "input"
+      },
+      {
+        "from": "equipment_medium_bowl",
+        "to": "action_a2",
+        "label": "tool"
+      },
+      {
+        "from": "equipment_whisk",
+        "to": "action_a2",
+        "label": "tool"
+      },
+      {
+        "from": "ingredient_large_egg_1_egg_yolk",
+        "to": "action_a3",
+        "label": "input"
+      },
+      {
+        "from": "ingredient_pure_vanilla_extract",
+        "to": "action_a3",
+        "label": "input"
+      },
+      {
+        "from": "equipment_medium_bowl",
+        "to": "action_a3",
+        "label": "tool"
+      },
+      {
+        "from": "equipment_whisk",
+        "to": "action_a3",
+        "label": "tool"
+      },
+      {
+        "from": "action_a2",
+        "to": "action_a3",
+        "label": "next"
+      },
+      {
+        "from": "equipment_large_bowl",
+        "to": "action_a4",
+        "label": "tool"
+      },
+      {
+        "from": "equipment_large_spoon",
+        "to": "action_a4",
+        "label": "tool"
+      },
+      {
+        "from": "equipment_spatula",
+        "to": "action_a4",
+        "label": "tool"
+      },
+      {
+        "from": "action_a1",
+        "to": "action_a4",
+        "label": "next"
+      },
+      {
+        "from": "action_a3",
+        "to": "action_a4",
+        "label": "next"
+      },
+      {
+        "from": "ingredient_semi_sweet_chocolate_chips_or_chocolate_chunks",
+        "to": "action_a5",
+        "label": "input"
+      },
+      {
+        "from": "equipment_spatula",
+        "to": "action_a5",
+        "label": "tool"
+      },
+      {
+        "from": "action_a4",
+        "to": "action_a5",
+        "label": "next"
+      },
+      {
+        "from": "equipment_large_bowl",
+        "to": "action_a6",
+        "label": "tool"
+      },
+      {
+        "from": "action_a5",
+        "to": "action_a6",
+        "label": "next"
+      },
+      {
+        "from": "equipment_oven",
+        "to": "action_a7",
+        "label": "tool"
+      },
+      {
+        "from": "equipment_large_baking_sheets",
+        "to": "action_a7",
+        "label": "tool"
+      },
+      {
+        "from": "equipment_parchment_paper",
+        "to": "action_a7",
+        "label": "tool"
+      },
+      {
+        "from": "equipment_silicone_baking_mats",
+        "to": "action_a7",
+        "label": "tool"
+      },
+      {
+        "from": "action_a6",
+        "to": "action_a8",
+        "label": "next"
+      },
+      {
+        "from": "action_a7",
+        "to": "action_a8",
+        "label": "next"
+      },
+      {
+        "from": "equipment_cookie_scoop",
+        "to": "action_a9",
+        "label": "tool"
+      },
+      {
+        "from": "equipment_tablespoon_measuring_spoon",
+        "to": "action_a9",
+        "label": "tool"
+      },
+      {
+        "from": "action_a8",
+        "to": "action_a9",
+        "label": "next"
+      },
+      {
+        "from": "equipment_oven",
+        "to": "action_a10",
+        "label": "tool"
+      },
+      {
+        "from": "equipment_large_baking_sheets",
+        "to": "action_a10",
+        "label": "tool"
+      },
+      {
+        "from": "action_a9",
+        "to": "action_a10",
+        "label": "next"
+      },
+      {
+        "from": "equipment_large_baking_sheets",
+        "to": "action_a11",
+        "label": "tool"
+      },
+      {
+        "from": "equipment_cooling_rack",
+        "to": "action_a11",
+        "label": "tool"
+      },
+      {
+        "from": "action_a10",
+        "to": "action_a11",
+        "label": "next"
+      },
+      {
+        "from": "ingredient_semi_sweet_chocolate_chips_or_chocolate_chunks",
+        "to": "action_a12",
+        "label": "input"
+      },
+      {
+        "from": "action_a11",
+        "to": "action_a12",
+        "label": "next"
+      }
+    ]
+  },
+  "flowchartMermaid": "flowchart TD\n  S1[\"Whisk\"]\n  S2[\"Whisk\"]\n  S3[\"Add\"]\n  S4[\"Combine\"]\n  S5[\"Fold\"]\n  S6[\"Chill\"]\n  S7[\"Prepare\"]\n  S8[\"Temper\"]\n  S9[\"Shape\"]\n  S10[\"Bake\"]\n  S11[\"Cool\"]\n  S12[\"Add\"]\n  S2 --&gt; S3\n  S1 --&gt; S4\n  S3 --&gt; S4\n  S4 --&gt; S5\n  S5 --&gt; S6\n  S6 --&gt; S8\n  S7 --&gt; S8\n  S8 --&gt; S9\n  S9 --&gt; S10\n  S10 --&gt; S11\n  S11 --&gt; S12",
+  "warnings": [
+    "The cookie dough requires chilling prior to shaping the cookies.",
+    "Chilling the cookie dough overnight is highly recommended to prevent overspreading.",
+    "The chocolate chips may not stick to the dough easily because of the melted butter.",
+    "The cookie dough requires chilling prior to shaping to prevent overspreading.",
+    "Chocolate chips may not stick to the dough easily because of the melted butter.",
+    "Do not overbake; centers will look very soft but will set while cooling."
+  ]
+}</pre>
+    <div id="flowchart"><svg id="recipe-flowchart-1772489267576" width="100%" xmlns="http://www.w3.org/2000/svg" class="flowchart" style="max-width: 350.5px;" viewBox="0 0 350.5 1006" role="graphics-document document" aria-roledescription="flowchart-v2"><style>#recipe-
+flowchart-1772489267576{font-family:"trebuchet 
+ms",verdana,arial,sans-serif;font-size:16px;fill:#333;}@keyframes 
+edge-animation-frame{from{stroke-dashoffset:0;}}@keyframes 
+dash{to{stroke-dashoffset:0;}}#recipe-flowchart-1772489267576 
+.edge-animation-slow{stroke-dasharray:9,5!important;stroke-
+dashoffset:900;animation:dash 50s linear 
+infinite;stroke-linecap:round;}#recipe-flowchart-1772489267576 
+.edge-animation-fast{stroke-dasharray:9,5!important;stroke-
+dashoffset:900;animation:dash 20s linear 
+infinite;stroke-linecap:round;}#recipe-flowchart-1772489267576 
+.error-icon{fill:#552222;}#recipe-flowchart-1772489267576 
+.error-text{fill:#552222;stroke:#552222;}#recipe-flowchart-1772489267576
+ 
+.edge-thickness-normal{stroke-width:1px;}#recipe-flowchart-1772489267576
+ 
+.edge-thickness-thick{stroke-width:3.5px;}#recipe-
+flowchart-1772489267576 
+.edge-pattern-solid{stroke-dasharray:0;}#recipe-flowchart-1772489267576 
+.edge-thickness-invisible{stroke-width:0;fill:none;}#recipe-
+flowchart-1772489267576 
+.edge-pattern-dashed{stroke-dasharray:3;}#recipe-flowchart-1772489267576
+ 
+.edge-pattern-dotted{stroke-dasharray:2;}#recipe-flowchart-1772489267576
+ .marker{fill:#333333;stroke:#333333;}#recipe-flowchart-1772489267576 
+.marker.cross{stroke:#333333;}#recipe-flowchart-1772489267576 
+svg{font-family:"trebuchet 
+ms",verdana,arial,sans-serif;font-size:16px;}#recipe-
+flowchart-1772489267576 p{margin:0;}#recipe-flowchart-1772489267576 
+.label{font-family:"trebuchet 
+ms",verdana,arial,sans-serif;color:#333;}#recipe-flowchart-1772489267576
+ .cluster-label text{fill:#333;}#recipe-flowchart-1772489267576 
+.cluster-label span{color:#333;}#recipe-flowchart-1772489267576 
+.cluster-label span 
+p{background-color:transparent;}#recipe-flowchart-1772489267576 .label 
+text,#recipe-flowchart-1772489267576 
+span{fill:#333;color:#333;}#recipe-flowchart-1772489267576 .node 
+rect,#recipe-flowchart-1772489267576 .node 
+circle,#recipe-flowchart-1772489267576 .node 
+ellipse,#recipe-flowchart-1772489267576 .node 
+polygon,#recipe-flowchart-1772489267576 .node 
+path{fill:#ECECFF;stroke:#9370DB;stroke-width:1px;}#recipe-
+flowchart-1772489267576 .rough-node .label 
+text,#recipe-flowchart-1772489267576 .node .label 
+text,#recipe-flowchart-1772489267576 .image-shape 
+.label,#recipe-flowchart-1772489267576 .icon-shape 
+.label{text-anchor:middle;}#recipe-flowchart-1772489267576 .node .katex 
+path{fill:#000;stroke:#000;stroke-width:1px;}#recipe-
+flowchart-1772489267576 .rough-node 
+.label,#recipe-flowchart-1772489267576 .node 
+.label,#recipe-flowchart-1772489267576 .image-shape 
+.label,#recipe-flowchart-1772489267576 .icon-shape 
+.label{text-align:center;}#recipe-flowchart-1772489267576 
+.node.clickable{cursor:pointer;}#recipe-flowchart-1772489267576 .root 
+.anchor 
+path{fill:#333333!important;stroke-width:0;stroke:#333333;}#recipe-
+flowchart-1772489267576 
+.arrowheadPath{fill:#333333;}#recipe-flowchart-1772489267576 .edgePath 
+.path{stroke:#333333;stroke-width:2.0px;}#recipe-flowchart-1772489267576
+ 
+.flowchart-link{stroke:#333333;fill:none;}#recipe-
+flowchart-1772489267576 .edgeLabel{background-color:rgba(232,232,232, 
+0.8);text-align:center;}#recipe-flowchart-1772489267576 .edgeLabel 
+p{background-color:rgba(232,232,232, 
+0.8);}#recipe-flowchart-1772489267576 .edgeLabel 
+rect{opacity:0.5;background-color:rgba(232,232,232, 
+0.8);fill:rgba(232,232,232, 0.8);}#recipe-flowchart-1772489267576 
+.labelBkg{background-color:rgba(232, 232, 232, 
+0.5);}#recipe-flowchart-1772489267576 .cluster 
+rect{fill:#ffffde;stroke:#aaaa33;stroke-width:1px;}#recipe-
+flowchart-1772489267576 .cluster 
+text{fill:#333;}#recipe-flowchart-1772489267576 .cluster 
+span{color:#333;}#recipe-flowchart-1772489267576 
+div.mermaidTooltip{position:absolute;text-align:center;max-
+width:200px;padding:2px;font-family:"trebuchet 
+ms",verdana,arial,sans-serif;font-size:12px;background:hsl(80, 100%, 
+96.2745098039%);border:1px solid 
+#aaaa33;border-radius:2px;pointer-events:none;z-index:100;}#recipe-
+flowchart-1772489267576 
+.flowchartTitleText{text-anchor:middle;font-size:18px;fill:#333;}
+#recipe-flowchart-1772489267576 
+rect.text{fill:none;stroke-width:0;}#recipe-flowchart-1772489267576 
+.icon-shape,#recipe-flowchart-1772489267576 
+.image-shape{background-color:rgba(232,232,232, 
+0.8);text-align:center;}#recipe-flowchart-1772489267576 .icon-shape 
+p,#recipe-flowchart-1772489267576 .image-shape 
+p{background-color:rgba(232,232,232, 
+0.8);padding:2px;}#recipe-flowchart-1772489267576 .icon-shape 
+rect,#recipe-flowchart-1772489267576 .image-shape 
+rect{opacity:0.5;background-color:rgba(232,232,232, 
+0.8);fill:rgba(232,232,232, 0.8);}#recipe-flowchart-1772489267576 
+.label-icon{display:inline-block;height:1em;overflow:visible;vertical-
+align:-0.125em;}#recipe-flowchart-1772489267576 .node .label-icon 
+path{fill:currentColor;stroke:revert;stroke-width:revert;}#recipe-
+flowchart-1772489267576 :root{--mermaid-font-family:"trebuchet 
+ms",verdana,arial,sans-serif;}</style><g><marker id="recipe-flowchart-1772489267576_flowchart-v2-pointEnd" class="marker flowchart-v2" viewBox="0 0 10 10" refX="5" refY="5" markerUnits="userSpaceOnUse" markerWidth="8" markerHeight="8" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" class="arrowMarkerPath" style="stroke-width: 1px; stroke-dasharray: 1px, 0px;"></path></marker><marker id="recipe-flowchart-1772489267576_flowchart-v2-pointStart" class="marker flowchart-v2" viewBox="0 0 10 10" refX="4.5" refY="5" markerUnits="userSpaceOnUse" markerWidth="8" markerHeight="8" orient="auto"><path d="M 0 5 L 10 10 L 10 0 z" class="arrowMarkerPath" style="stroke-width: 1px; stroke-dasharray: 1px, 0px;"></path></marker><marker id="recipe-flowchart-1772489267576_flowchart-v2-circleEnd" class="marker flowchart-v2" viewBox="0 0 10 10" refX="11" refY="5" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto"><circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 1px; stroke-dasharray: 1px, 0px;"></circle></marker><marker id="recipe-flowchart-1772489267576_flowchart-v2-circleStart" class="marker flowchart-v2" viewBox="0 0 10 10" refX="-1" refY="5" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto"><circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 1px; stroke-dasharray: 1px, 0px;"></circle></marker><marker id="recipe-flowchart-1772489267576_flowchart-v2-crossEnd" class="marker cross flowchart-v2" viewBox="0 0 11 11" refX="12" refY="5.2" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto"><path d="M 1,1 l 9,9 M 10,1 l -9,9" class="arrowMarkerPath" style="stroke-width: 2px; stroke-dasharray: 1px, 0px;"></path></marker><marker id="recipe-flowchart-1772489267576_flowchart-v2-crossStart" class="marker cross flowchart-v2" viewBox="0 0 11 11" refX="-1" refY="5.2" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto"><path d="M 1,1 l 9,9 M 10,1 l -9,9" class="arrowMarkerPath" style="stroke-width: 2px; stroke-dasharray: 1px, 0px;"></path></marker><g class="root"><g class="clusters"></g><g class="edgePaths"><path d="M203.133,62L203.133,66.167C203.133,70.333,203.133,78.667,203.133,86.333C203.133,94,203.133,101,203.133,104.5L203.133,108" id="L_S2_S3_0" class=" edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_S2_S3_0" data-points="W3sieCI6MjAzLjEzMzMzMTI5ODgyODEyLCJ5Ijo2Mn0seyJ4IjoyMDMuMTMzMzMxMjk4ODI4MTIsInkiOjg3fSx7IngiOjIwMy4xMzMzMzEyOTg4MjgxMiwieSI6MTEyfV0=" marker-end="url(#recipe-flowchart-1772489267576_flowchart-v2-pointEnd)"></path><path d="M58.75,166L58.75,170.167C58.75,174.333,58.75,182.667,63.994,190.61C69.237,198.554,79.725,206.108,84.968,209.885L90.212,213.662" id="L_S1_S4_0" class=" edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_S1_S4_0" data-points="W3sieCI6NTguNzUsInkiOjE2Nn0seyJ4Ijo1OC43NSwieSI6MTkxfSx7IngiOjkzLjQ1NzUzMTU2MjIxODI5LCJ5IjoyMTZ9XQ==" marker-end="url(#recipe-flowchart-1772489267576_flowchart-v2-pointEnd)"></path><path d="M203.133,166L203.133,170.167C203.133,174.333,203.133,182.667,197.89,190.61C192.646,198.554,182.159,206.108,176.915,209.885L171.671,213.662" id="L_S3_S4_0" class=" edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_S3_S4_0" data-points="W3sieCI6MjAzLjEzMzMzMTI5ODgyODEyLCJ5IjoxNjZ9LHsieCI6MjAzLjEzMzMzMTI5ODgyODEyLCJ5IjoxOTF9LHsieCI6MTY4LjQyNTc5OTczNjYwOTgzLCJ5IjoyMTZ9XQ==" marker-end="url(#recipe-flowchart-1772489267576_flowchart-v2-pointEnd)"></path><path d="M130.942,270L130.942,274.167C130.942,278.333,130.942,286.667,130.942,294.333C130.942,302,130.942,309,130.942,312.5L130.942,316" id="L_S4_S5_0" class=" edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_S4_S5_0" data-points="W3sieCI6MTMwLjk0MTY2NTY0OTQxNDA2LCJ5IjoyNzB9LHsieCI6MTMwLjk0MTY2NTY0OTQxNDA2LCJ5IjoyOTV9LHsieCI6MTMwLjk0MTY2NTY0OTQxNDA2LCJ5IjozMjB9XQ==" marker-end="url(#recipe-flowchart-1772489267576_flowchart-v2-pointEnd)"></path><path d="M130.942,374L130.942,378.167C130.942,382.333,130.942,390.667,130.942,398.333C130.942,406,130.942,413,130.942,416.5L130.942,420" id="L_S5_S6_0" class=" edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_S5_S6_0" data-points="W3sieCI6MTMwLjk0MTY2NTY0OTQxNDA2LCJ5IjozNzR9LHsieCI6MTMwLjk0MTY2NTY0OTQxNDA2LCJ5IjozOTl9LHsieCI6MTMwLjk0MTY2NTY0OTQxNDA2LCJ5Ijo0MjR9XQ==" marker-end="url(#recipe-flowchart-1772489267576_flowchart-v2-pointEnd)"></path><path d="M130.942,478L130.942,482.167C130.942,486.333,130.942,494.667,136.554,502.627C142.165,510.587,153.389,518.173,159.001,521.967L164.613,525.76" id="L_S6_S8_0" class=" edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_S6_S8_0" data-points="W3sieCI6MTMwLjk0MTY2NTY0OTQxNDA2LCJ5Ijo0Nzh9LHsieCI6MTMwLjk0MTY2NTY0OTQxNDA2LCJ5Ijo1MDN9LHsieCI6MTY3LjkyNjg0MTA3NTYwMzc2LCJ5Ijo1Mjh9XQ==" marker-end="url(#recipe-flowchart-1772489267576_flowchart-v2-pointEnd)"></path><path d="M284.8,478L284.8,482.167C284.8,486.333,284.8,494.667,279.188,502.627C273.576,510.587,262.353,518.173,256.741,521.967L251.129,525.76" id="L_S7_S8_0" class=" edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_S7_S8_0" data-points="W3sieCI6Mjg0Ljc5OTk5NTQyMjM2MzMsInkiOjQ3OH0seyJ4IjoyODQuNzk5OTk1NDIyMzYzMywieSI6NTAzfSx7IngiOjI0Ny44MTQ4MTk5OTYxNzM1OCwieSI6NTI4fV0=" marker-end="url(#recipe-flowchart-1772489267576_flowchart-v2-pointEnd)"></path><path d="M207.871,582L207.871,586.167C207.871,590.333,207.871,598.667,207.871,606.333C207.871,614,207.871,621,207.871,624.5L207.871,628" id="L_S8_S9_0" class=" edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_S8_S9_0" data-points="W3sieCI6MjA3Ljg3MDgzMDUzNTg4ODY3LCJ5Ijo1ODJ9LHsieCI6MjA3Ljg3MDgzMDUzNTg4ODY3LCJ5Ijo2MDd9LHsieCI6MjA3Ljg3MDgzMDUzNTg4ODY3LCJ5Ijo2MzJ9XQ==" marker-end="url(#recipe-flowchart-1772489267576_flowchart-v2-pointEnd)"></path><path d="M207.871,686L207.871,690.167C207.871,694.333,207.871,702.667,207.871,710.333C207.871,718,207.871,725,207.871,728.5L207.871,732" id="L_S9_S10_0" class=" edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_S9_S10_0" data-points="W3sieCI6MjA3Ljg3MDgzMDUzNTg4ODY3LCJ5Ijo2ODZ9LHsieCI6MjA3Ljg3MDgzMDUzNTg4ODY3LCJ5Ijo3MTF9LHsieCI6MjA3Ljg3MDgzMDUzNTg4ODY3LCJ5Ijo3MzZ9XQ==" marker-end="url(#recipe-flowchart-1772489267576_flowchart-v2-pointEnd)"></path><path d="M207.871,790L207.871,794.167C207.871,798.333,207.871,806.667,207.871,814.333C207.871,822,207.871,829,207.871,832.5L207.871,836" id="L_S10_S11_0" class=" edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_S10_S11_0" data-points="W3sieCI6MjA3Ljg3MDgzMDUzNTg4ODY3LCJ5Ijo3OTB9LHsieCI6MjA3Ljg3MDgzMDUzNTg4ODY3LCJ5Ijo4MTV9LHsieCI6MjA3Ljg3MDgzMDUzNTg4ODY3LCJ5Ijo4NDB9XQ==" marker-end="url(#recipe-flowchart-1772489267576_flowchart-v2-pointEnd)"></path><path d="M207.871,894L207.871,898.167C207.871,902.333,207.871,910.667,207.871,918.333C207.871,926,207.871,933,207.871,936.5L207.871,940" id="L_S11_S12_0" class=" edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_S11_S12_0" data-points="W3sieCI6MjA3Ljg3MDgzMDUzNTg4ODY3LCJ5Ijo4OTR9LHsieCI6MjA3Ljg3MDgzMDUzNTg4ODY3LCJ5Ijo5MTl9LHsieCI6MjA3Ljg3MDgzMDUzNTg4ODY3LCJ5Ijo5NDR9XQ==" marker-end="url(#recipe-flowchart-1772489267576_flowchart-v2-pointEnd)"></path></g><g class="edgeLabels"><g class="edgeLabel"><g class="label" data-id="L_S2_S3_0" transform="translate(0, 0)"><foreignObject width="0" height="0"><div style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;" xmlns="http://www.w3.org/1999/xhtml" class="labelBkg"><span class="edgeLabel "></span></div></foreignObject></g></g><g class="edgeLabel"><g class="label" data-id="L_S1_S4_0" transform="translate(0, 0)"><foreignObject width="0" height="0"><div style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;" xmlns="http://www.w3.org/1999/xhtml" class="labelBkg"><span class="edgeLabel "></span></div></foreignObject></g></g><g class="edgeLabel"><g class="label" data-id="L_S3_S4_0" transform="translate(0, 0)"><foreignObject width="0" height="0"><div style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;" xmlns="http://www.w3.org/1999/xhtml" class="labelBkg"><span class="edgeLabel "></span></div></foreignObject></g></g><g class="edgeLabel"><g class="label" data-id="L_S4_S5_0" transform="translate(0, 0)"><foreignObject width="0" height="0"><div style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;" xmlns="http://www.w3.org/1999/xhtml" class="labelBkg"><span class="edgeLabel "></span></div></foreignObject></g></g><g class="edgeLabel"><g class="label" data-id="L_S5_S6_0" transform="translate(0, 0)"><foreignObject width="0" height="0"><div style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;" xmlns="http://www.w3.org/1999/xhtml" class="labelBkg"><span class="edgeLabel "></span></div></foreignObject></g></g><g class="edgeLabel"><g class="label" data-id="L_S6_S8_0" transform="translate(0, 0)"><foreignObject width="0" height="0"><div style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;" xmlns="http://www.w3.org/1999/xhtml" class="labelBkg"><span class="edgeLabel "></span></div></foreignObject></g></g><g class="edgeLabel"><g class="label" data-id="L_S7_S8_0" transform="translate(0, 0)"><foreignObject width="0" height="0"><div style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;" xmlns="http://www.w3.org/1999/xhtml" class="labelBkg"><span class="edgeLabel "></span></div></foreignObject></g></g><g class="edgeLabel"><g class="label" data-id="L_S8_S9_0" transform="translate(0, 0)"><foreignObject width="0" height="0"><div style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;" xmlns="http://www.w3.org/1999/xhtml" class="labelBkg"><span class="edgeLabel "></span></div></foreignObject></g></g><g class="edgeLabel"><g class="label" data-id="L_S9_S10_0" transform="translate(0, 0)"><foreignObject width="0" height="0"><div style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;" xmlns="http://www.w3.org/1999/xhtml" class="labelBkg"><span class="edgeLabel "></span></div></foreignObject></g></g><g class="edgeLabel"><g class="label" data-id="L_S10_S11_0" transform="translate(0, 0)"><foreignObject width="0" height="0"><div style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;" xmlns="http://www.w3.org/1999/xhtml" class="labelBkg"><span class="edgeLabel "></span></div></foreignObject></g></g><g class="edgeLabel"><g class="label" data-id="L_S11_S12_0" transform="translate(0, 0)"><foreignObject width="0" height="0"><div style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;" xmlns="http://www.w3.org/1999/xhtml" class="labelBkg"><span class="edgeLabel "></span></div></foreignObject></g></g></g><g class="nodes"><g class="node default  " id="flowchart-S1-0" transform="translate(58.75, 139)"><rect class="basic label-container" style="" x="-50.75" y="-27" width="101.5" height="54"></rect><g class="label" style="" transform="translate(-20.75, -12)"><rect></rect><foreignObject width="41.5" height="24"><div style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;" xmlns="http://www.w3.org/1999/xhtml"><span class="nodeLabel "><p>Whisk</p></span></div></foreignObject></g></g><g class="node default  " id="flowchart-S2-1" transform="translate(203.13333129882812, 35)"><rect class="basic label-container" style="" x="-50.75" y="-27" width="101.5" height="54"></rect><g class="label" style="" transform="translate(-20.75, -12)"><rect></rect><foreignObject width="41.5" height="24"><div style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;" xmlns="http://www.w3.org/1999/xhtml"><span class="nodeLabel "><p>Whisk</p></span></div></foreignObject></g></g><g class="node default  " id="flowchart-S3-2" transform="translate(203.13333129882812, 139)"><rect class="basic label-container" style="" x="-43.633331298828125" y="-27" width="87.26666259765625" height="54"></rect><g class="label" style="" transform="translate(-13.633331298828125, -12)"><rect></rect><foreignObject width="27.26666259765625" height="24"><div style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;" xmlns="http://www.w3.org/1999/xhtml"><span class="nodeLabel "><p>Add</p></span></div></foreignObject></g></g><g class="node default  " id="flowchart-S4-3" transform="translate(130.94166564941406, 243)"><rect class="basic label-container" style="" x="-61.19999694824219" y="-27" width="122.39999389648438" height="54"></rect><g class="label" style="" transform="translate(-31.199996948242188, -12)"><rect></rect><foreignObject width="62.399993896484375" height="24"><div style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;" xmlns="http://www.w3.org/1999/xhtml"><span class="nodeLabel "><p>Combine</p></span></div></foreignObject></g></g><g class="node default  " id="flowchart-S5-4" transform="translate(130.94166564941406, 347)"><rect class="basic label-container" style="" x="-45.30833435058594" y="-27" width="90.61666870117188" height="54"></rect><g class="label" style="" transform="translate(-15.308334350585938, -12)"><rect></rect><foreignObject width="30.616668701171875" height="24"><div style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;" xmlns="http://www.w3.org/1999/xhtml"><span class="nodeLabel "><p>Fold</p></span></div></foreignObject></g></g><g class="node default  " id="flowchart-S6-5" transform="translate(130.94166564941406, 451)"><rect class="basic label-container" style="" x="-46.15833282470703" y="-27" width="92.31666564941406" height="54"></rect><g class="label" style="" transform="translate(-16.15833282470703, -12)"><rect></rect><foreignObject width="32.31666564941406" height="24"><div style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;" xmlns="http://www.w3.org/1999/xhtml"><span class="nodeLabel "><p>Chill</p></span></div></foreignObject></g></g><g class="node default  " id="flowchart-S7-6" transform="translate(284.7999954223633, 451)"><rect class="basic label-container" style="" x="-57.69999694824219" y="-27" width="115.39999389648438" height="54"></rect><g class="label" style="" transform="translate(-27.699996948242188, -12)"><rect></rect><foreignObject width="55.399993896484375" height="24"><div style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;" xmlns="http://www.w3.org/1999/xhtml"><span class="nodeLabel "><p>Prepare</p></span></div></foreignObject></g></g><g class="node default  " id="flowchart-S8-7" transform="translate(207.87083053588867, 555)"><rect class="basic label-container" style="" x="-56.59166717529297" y="-27" width="113.18333435058594" height="54"></rect><g class="label" style="" transform="translate(-26.59166717529297, -12)"><rect></rect><foreignObject width="53.18333435058594" height="24"><div style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;" xmlns="http://www.w3.org/1999/xhtml"><span class="nodeLabel "><p>Temper</p></span></div></foreignObject></g></g><g class="node default  " id="flowchart-S9-8" transform="translate(207.87083053588867, 659)"><rect class="basic label-container" style="" x="-51.25" y="-27" width="102.5" height="54"></rect><g class="label" style="" transform="translate(-21.25, -12)"><rect></rect><foreignObject width="42.5" height="24"><div style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;" xmlns="http://www.w3.org/1999/xhtml"><span class="nodeLabel "><p>Shape</p></span></div></foreignObject></g></g><g class="node default  " id="flowchart-S10-9" transform="translate(207.87083053588867, 763)"><rect class="basic label-container" style="" x="-47.125" y="-27" width="94.25" height="54"></rect><g class="label" style="" transform="translate(-17.125, -12)"><rect></rect><foreignObject width="34.25" height="24"><div style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;" xmlns="http://www.w3.org/1999/xhtml"><span class="nodeLabel "><p>Bake</p></span></div></foreignObject></g></g><g class="node default  " id="flowchart-S11-10" transform="translate(207.87083053588867, 867)"><rect class="basic label-container" style="" x="-45.724998474121094" y="-27" width="91.44999694824219" height="54"></rect><g class="label" style="" transform="translate(-15.724998474121094, -12)"><rect></rect><foreignObject width="31.449996948242188" height="24"><div style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;" xmlns="http://www.w3.org/1999/xhtml"><span class="nodeLabel "><p>Cool</p></span></div></foreignObject></g></g><g class="node default  " id="flowchart-S12-11" transform="translate(207.87083053588867, 971)"><rect class="basic label-container" style="" x="-43.633331298828125" y="-27" width="87.26666259765625" height="54"></rect><g class="label" style="" transform="translate(-13.633331298828125, -12)"><rect></rect><foreignObject width="27.26666259765625" height="24"><div style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;" xmlns="http://www.w3.org/1999/xhtml"><span class="nodeLabel "><p>Add</p></span></div></foreignObject></g></g></g></g></g></svg></div>
+
+    <script type="module">
+      import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs";
+
+      mermaid.initialize({ startOnLoad: false, securityLevel: "loose" });
+
+      const form = document.getElementById("url-form");
+      const urlInput = document.getElementById("url-input");
+      const result = document.getElementById("result");
+      const jsonOutput = document.getElementById("json-output");
+      const flowchart = document.getElementById("flowchart");
+
+      async function renderFlowchart(markup) {
+        if (!markup) {
+          flowchart.innerHTML = "";
+          return;
+        }
+
+        const id = `recipe-flowchart-${Date.now()}`;
+        const { svg } = await mermaid.render(id, markup);
+        flowchart.innerHTML = svg;
+      }
+
+      form.addEventListener("submit", async (event) => {
+        event.preventDefault();
+
+        result.textContent = "Loading...";
+        jsonOutput.textContent = "";
+        flowchart.innerHTML = "";
+
+        const response = await fetch("/api/submit-url", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ url: urlInput.value })
+        });
+
+        const data = await response.json();
+        
+        console.log(data)
+
+        if (!response.ok) {
+          result.textContent = data.error || "Request failed";
+          return;
+        }
+
+        result.textContent = "Recipe graph generated.";
+        jsonOutput.textContent = JSON.stringify(data, null, 2);
+        await renderFlowchart(data.flowchartMermaid);
+      });
+    </script>
+  
+</body></html>
