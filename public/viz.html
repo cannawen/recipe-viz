@@ -61,6 +61,136 @@
         throw new Error("Unsupported Cytoscape JSON format");
       }
 
+      function computePositions(elements) {
+        const nodes = elements.filter((element) => element.data && element.data.id);
+        const edges = elements.filter((element) => element.data && element.data.source && element.data.target);
+
+        const incoming = new Map();
+        const outgoing = new Map();
+        const labels = new Map();
+
+        for (const node of nodes) {
+          const id = node.data.id;
+          incoming.set(id, new Set());
+          outgoing.set(id, new Set());
+          labels.set(id, node.data.label || id);
+        }
+
+        for (const edge of edges) {
+          const source = edge.data.source;
+          const target = edge.data.target;
+
+          if (outgoing.has(source) && incoming.has(target)) {
+            outgoing.get(source).add(target);
+            incoming.get(target).add(source);
+          }
+        }
+
+        const ingredientIds = nodes
+          .map((node) => node.data.id)
+          .filter((id) => (incoming.get(id)?.size || 0) === 0)
+          .sort((left, right) => labels.get(left).localeCompare(labels.get(right)));
+
+        const inDegree = new Map();
+        for (const node of nodes) {
+          const id = node.data.id;
+          inDegree.set(id, incoming.get(id)?.size || 0);
+        }
+
+        const queue = nodes
+          .map((node) => node.data.id)
+          .filter((id) => (inDegree.get(id) || 0) === 0)
+          .sort((left, right) => labels.get(left).localeCompare(labels.get(right)));
+
+        const level = new Map();
+        for (const id of queue) level.set(id, 0);
+
+        let index = 0;
+        while (index < queue.length) {
+          const currentId = queue[index++];
+          const currentLevel = level.get(currentId) || 0;
+
+          for (const nextId of outgoing.get(currentId) || []) {
+            level.set(nextId, Math.max(level.get(nextId) || 0, currentLevel + 1));
+            inDegree.set(nextId, (inDegree.get(nextId) || 0) - 1);
+
+            if ((inDegree.get(nextId) || 0) === 0) {
+              queue.push(nextId);
+            }
+          }
+        }
+
+        for (const node of nodes) {
+          const id = node.data.id;
+          if (!level.has(id)) {
+            level.set(id, 1);
+          }
+        }
+
+        const positions = new Map();
+        const leftX = 80;
+        const topY = 60;
+        const rowGap = 56;
+        const columnGap = 260;
+
+        ingredientIds.forEach((id, ingredientIndex) => {
+          positions.set(id, {
+            x: leftX,
+            y: topY + ingredientIndex * rowGap,
+          });
+        });
+
+        const maxLevel = Math.max(...Array.from(level.values()));
+
+        for (let depth = 1; depth <= maxLevel; depth++) {
+          const levelIds = nodes
+            .map((node) => node.data.id)
+            .filter((id) => (level.get(id) || 0) === depth)
+            .sort((left, right) => {
+              const leftIncoming = Array.from(incoming.get(left) || []).map((sourceId) => positions.get(sourceId)?.y).filter((y) => Number.isFinite(y));
+              const rightIncoming = Array.from(incoming.get(right) || []).map((sourceId) => positions.get(sourceId)?.y).filter((y) => Number.isFinite(y));
+
+              const leftAvg = leftIncoming.length
+                ? leftIncoming.reduce((sum, value) => sum + value, 0) / leftIncoming.length
+                : Number.MAX_SAFE_INTEGER;
+              const rightAvg = rightIncoming.length
+                ? rightIncoming.reduce((sum, value) => sum + value, 0) / rightIncoming.length
+                : Number.MAX_SAFE_INTEGER;
+
+              if (leftAvg === rightAvg) {
+                return labels.get(left).localeCompare(labels.get(right));
+              }
+
+              return leftAvg - rightAvg;
+            });
+
+          let previousY = topY - rowGap;
+
+          for (const id of levelIds) {
+            const predecessorYs = Array.from(incoming.get(id) || [])
+              .map((sourceId) => positions.get(sourceId)?.y)
+              .filter((y) => Number.isFinite(y));
+
+            let desiredY = predecessorYs.length
+              ? predecessorYs.reduce((sum, value) => sum + value, 0) / predecessorYs.length
+              : topY;
+
+            if (desiredY < previousY + rowGap) {
+              desiredY = previousY + rowGap;
+            }
+
+            positions.set(id, {
+              x: leftX + depth * columnGap,
+              y: desiredY,
+            });
+
+            previousY = desiredY;
+          }
+        }
+
+        return positions;
+      }
+
       async function loadGraph() {
         const response = await fetch("/cytoscape.json", { cache: "no-store" });
         if (!response.ok) {
@@ -69,6 +199,7 @@
 
         const payload = await response.json();
         const elements = normalizeElements(payload);
+        const positions = computePositions(elements);
 
         if (!elements.length) {
           throw new Error("No nodes/edges found in cytoscape.json");
@@ -104,10 +235,10 @@
             }
           ],
           layout: {
-            name: "cose",
-            animate: false,
+            name: "preset",
             fit: true,
-            padding: 24
+            padding: 24,
+            positions: (node) => positions.get(node.id()) || { x: 80, y: 60 }
           }
         });
 
