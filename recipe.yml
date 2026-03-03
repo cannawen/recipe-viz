@@ -11,7 +11,7 @@ ingredients:
   - name: salt
     amount: 0.5
     units: tsp
-  - name: butter
+  - name: melted butter
     amount: 170
     units: g
   - name: brown sugar
@@ -30,48 +30,28 @@ ingredients:
   - name: chocolate chips
     amount: 225
     units: g
-equipment:
-  - large bowl
-  - whisk
-  - microwave
-  - medium bowl
-  - fridge
-  - oven
-  - baking sheet
-steps:
+combinations:
   dry ingredients:
-    - large bowl
-    - whisk
     - flour
     - baking soda
     - cornstarch
     - salt
-  melted butter:
-    - microwave
-    - butter
   creamed butter:
-    - medium bowl
     - melted butter
     - brown sugar
     - granulated sugar
   wet ingredients:
-    - medium bowl
     - creamed butter
     - egg
     - egg yolk
     - vanilla extract
   cookie dough:
-    - large bowl
     - dry ingredients
     - wet ingredients
     - chocolate chips
   chilled cookie dough:
-    - fridge
     - cookie dough
   uncooked cookies:
-    - baking sheet
     - chilled cookie dough
   cookies:
-    - oven
     - uncooked cookies
-
