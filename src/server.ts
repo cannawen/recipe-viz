@@ -2,6 +2,8 @@ import "dotenv/config";
 import express from "express";
 import path from "path";
 import { GoogleGenAI } from "@google/genai";
+import fs from "node:fs";
+import { isMap, isScalar, isSeq, parseDocument } from "yaml";
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -19,8 +21,134 @@ app.use(express.json());
 const publicDir = path.join(__dirname, "..", "public");
 app.use(express.static(publicDir));
 
-app.get("/cytoscape.json", (_req, res) => {
-  res.sendFile(path.join(__dirname, "..", "cytoscape.json"));
+const recipePath = path.join(__dirname, "..", "recipe.yml");
+
+const normalizeId = (value: string): string => value.trim().replace(/:+$/, "");
+
+const toNodeId = (prefix: string, value: string): string => {
+  const slug = normalizeId(value)
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "_")
+    .replace(/^_+|_+$/g, "");
+
+  return `${prefix}_${slug || "item"}`;
+};
+
+const escapeMermaidLabel = (value: string): string => value.replace(/"/g, '\\"');
+
+function buildMermaidFromRecipeYaml(rawYaml: string): string {
+  const normalizedRaw = rawYaml.replace(
+    /^(\s*id:\s*)([^"'#\n][^#\n]*?):\s*$/gm,
+    (_match: string, prefix: string, value: string) => `${prefix}${value.trim()}`,
+  );
+
+  const doc = parseDocument(normalizedRaw, { uniqueKeys: false });
+  if (doc.errors.length > 0) {
+    throw new Error(doc.errors.map((error) => error.message).join("; "));
+  }
+
+  const parsed = doc.toJS() as {
+    ingredients?: Array<{ id?: unknown; amount?: unknown; units?: unknown }>;
+  };
+
+  const lines: string[] = ["flowchart LR"];
+  const ingredientNodeByName = new Map<string, string>();
+  const stepNodeByName = new Map<string, string>();
+
+  const ingredients = Array.isArray(parsed.ingredients) ? parsed.ingredients : [];
+  for (const ingredient of ingredients) {
+    if (!ingredient || typeof ingredient.id !== "string" || ingredient.id.trim().length === 0) {
+      continue;
+    }
+
+    const ingredientName = normalizeId(ingredient.id);
+    const nodeId = toNodeId("ing", ingredientName);
+    const amountText = typeof ingredient.amount === "number" ? `${ingredient.amount}` : "";
+    const unitsText = typeof ingredient.units === "string" && ingredient.units.trim().length > 0
+      ? ingredient.units.trim()
+      : "";
+    const label = [amountText, unitsText, ingredientName].filter(Boolean).join(" ");
+
+    ingredientNodeByName.set(ingredientName, nodeId);
+    lines.push(`  ${nodeId}["${escapeMermaidLabel(label)}"]`);
+  }
+
+  const rootNode = doc.contents;
+  const stepsNode = isMap(rootNode) && rootNode.get("steps", true) ? rootNode.get("steps", true) : null;
+
+  if (!stepsNode || !isMap(stepsNode)) {
+    return lines.join("\n");
+  }
+
+  type ParsedStep = { id: string; action: string; dependencies: string[] };
+  const parsedSteps: ParsedStep[] = [];
+
+  for (let index = 0; index + 1 < stepsNode.items.length; index += 2) {
+    const idPair = stepsNode.items[index];
+    const actionPair = stepsNode.items[index + 1];
+
+    const idKey = isScalar(idPair.key) ? String(idPair.key.value ?? "") : "";
+    if (idKey !== "id") {
+      continue;
+    }
+
+    const rawStepId = isScalar(idPair.value) ? String(idPair.value.value ?? "") : "";
+    const stepId = normalizeId(rawStepId);
+    if (!stepId) {
+      continue;
+    }
+
+    const action = isScalar(actionPair.key) ? String(actionPair.key.value ?? "") : "";
+    if (!action || action === "id") {
+      continue;
+    }
+
+    const valueNode = actionPair.value;
+    if (!isSeq(valueNode)) {
+      continue;
+    }
+
+    const dependencies = valueNode.items
+      .filter((item) => isScalar(item) && typeof item.value === "string" && item.value.trim().length > 0)
+      .map((item) => normalizeId(String((item as { value: string }).value)));
+
+    parsedSteps.push({ id: stepId, action, dependencies });
+  }
+
+  for (const step of parsedSteps) {
+    const nodeId = toNodeId("step", step.id);
+    stepNodeByName.set(step.id, nodeId);
+    lines.push(`  ${nodeId}["${escapeMermaidLabel(`${step.id} (${step.action})`)}"]`);
+  }
+
+  for (const step of parsedSteps) {
+    const stepNodeId = stepNodeByName.get(step.id);
+    if (!stepNodeId) {
+      continue;
+    }
+
+    for (const dep of step.dependencies) {
+      const sourceId = ingredientNodeByName.get(dep) || stepNodeByName.get(dep);
+      if (!sourceId) {
+        continue;
+      }
+
+      lines.push(`  ${sourceId} --> ${stepNodeId}`);
+    }
+  }
+
+  return lines.join("\n");
+}
+
+app.get("/recipe.mmd", (_req, res) => {
+  try {
+    const rawYaml = fs.readFileSync(recipePath, "utf8");
+    const graph = buildMermaidFromRecipeYaml(rawYaml);
+    res.type("text/plain").send(graph);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Unknown error";
+    res.status(500).type("text/plain").send(`Failed to build Mermaid graph: ${message}`);
+  }
 });
 
 app.post("/api/submit-url", async (req, res) => {
