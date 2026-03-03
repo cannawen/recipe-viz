@@ -40,30 +40,30 @@ equipment:
 steps:
   dry ingredients:
     - large bowl
-      whisk
+    - whisk
     - flour
-      baking soda
-      cornstarch
-      salt
+    - baking soda
+    - cornstarch
+    - salt
   melted butter:
     - microwave
     - butter
   creamed butter:
     - medium bowl
     - melted butter
-      brown sugar
-      granulated sugar
+    - brown sugar
+    - granulated sugar
   wet ingredients:
     - medium bowl
     - creamed butter
-      egg
-      egg yolk
-      vanilla extract
+    - egg
+    - egg yolk
+    - vanilla extract
   cookie dough:
     - large bowl
     - dry ingredients
-      wet ingredients
-      chocolate chips
+    - wet ingredients
+    - chocolate chips
   chilled cookie dough:
     - fridge
     - cookie dough
