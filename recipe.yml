@@ -1,0 +1,41 @@
+ingredients:
+  - name: flour
+    amount: 281
+    units: g
+  - name: baking soda
+    amount: 1
+    units: tsp
+  - name: cornstarch
+    amount: 1.5
+    units: tsp
+  - name: salt
+    amount: 0.5
+    units: tsp
+  - name: unsalted butter
+    amount: 170
+    units: g
+  - name: brown sugar
+    amount: 150
+    units: g
+  - name: granulated sugar
+    amount: 100
+    units: g
+  - name: egg
+    amount: 1
+  - name: egg yolk
+    amount: 1
+  - name: vanilla extract
+    amount: 2
+    units: tsp
+  - name: chocolate chips
+    amount: 225
+    units: g
+equipment:
+  - large bowl
+  - whisk
+  - medium bowl
+  - spatula
+  - oven
+  - baking sheet
+  - cooling rack
+

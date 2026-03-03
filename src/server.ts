@@ -58,14 +58,17 @@ app.post("/api/submit-url", async (req, res) => {
 
   console.log(html)
 
-  const response = await ai.models.generateContent({
+  const textRecipe = await ai.models.generateContent({
     model: "gemini-3-flash-preview",
-    contents: `${parsedUrl.toString()}\n\n${html}`,
+    contents: [
+      "Given the following HTML, extract only the information required to make the recipe",
+       html
+      ].join("\n"),
   });
 
-  console.log(response.text);
+  console.log(textRecipe.text);
 
-  return res.json({ message: response.text });
+  return res.json({ message: textRecipe.text });
 });
 
 app.get("*", (_req, res) => {
