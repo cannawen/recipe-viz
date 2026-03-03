@@ -86,11 +86,6 @@
           }
         }
 
-        const ingredientIds = nodes
-          .map((node) => node.data.id)
-          .filter((id) => (incoming.get(id)?.size || 0) === 0)
-          .sort((left, right) => labels.get(left).localeCompare(labels.get(right)));
-
         const inDegree = new Map();
         for (const node of nodes) {
           const id = node.data.id;
@@ -113,7 +108,6 @@
           for (const nextId of outgoing.get(currentId) || []) {
             level.set(nextId, Math.max(level.get(nextId) || 0, currentLevel + 1));
             inDegree.set(nextId, (inDegree.get(nextId) || 0) - 1);
-
             if ((inDegree.get(nextId) || 0) === 0) {
               queue.push(nextId);
             }
@@ -122,8 +116,253 @@
 
         for (const node of nodes) {
           const id = node.data.id;
-          if (!level.has(id)) {
-            level.set(id, 1);
+          if (!level.has(id)) level.set(id, 1);
+        }
+
+        const maxLevel = Math.max(...Array.from(level.values()));
+        const realNodeIds = new Set(nodes.map((node) => node.data.id));
+        const dummyPrefix = "__dummy__";
+
+        const expandedIncoming = new Map();
+        const expandedOutgoing = new Map();
+        const expandedLevelNodes = new Map();
+
+        function ensureExpandedNode(id, depth) {
+          if (!expandedIncoming.has(id)) expandedIncoming.set(id, new Set());
+          if (!expandedOutgoing.has(id)) expandedOutgoing.set(id, new Set());
+          if (!expandedLevelNodes.has(depth)) expandedLevelNodes.set(depth, []);
+          const list = expandedLevelNodes.get(depth);
+          if (!list.includes(id)) list.push(id);
+        }
+
+        for (let depth = 0; depth <= maxLevel; depth++) {
+          expandedLevelNodes.set(depth, []);
+        }
+
+        for (const node of nodes) {
+          const id = node.data.id;
+          ensureExpandedNode(id, level.get(id) || 0);
+        }
+
+        function addExpandedEdge(source, target) {
+          if (!expandedOutgoing.has(source)) expandedOutgoing.set(source, new Set());
+          if (!expandedIncoming.has(target)) expandedIncoming.set(target, new Set());
+          expandedOutgoing.get(source).add(target);
+          expandedIncoming.get(target).add(source);
+        }
+
+        for (const edge of edges) {
+          const source = edge.data.source;
+          const target = edge.data.target;
+          if (!realNodeIds.has(source) || !realNodeIds.has(target)) continue;
+
+          const sourceLevel = level.get(source) || 0;
+          const targetLevel = level.get(target) || 0;
+
+          if (targetLevel <= sourceLevel) {
+            addExpandedEdge(source, target);
+            continue;
+          }
+
+          let previous = source;
+          for (let depth = sourceLevel + 1; depth <= targetLevel; depth++) {
+            const next = depth === targetLevel
+              ? target
+              : `${dummyPrefix}${source}__${target}__${depth}`;
+
+            if (!labels.has(next)) labels.set(next, next);
+            ensureExpandedNode(next, depth);
+            addExpandedEdge(previous, next);
+            previous = next;
+          }
+        }
+
+        const sourceNodes = (expandedLevelNodes.get(0) || []).filter((id) => realNodeIds.has(id));
+        const sourceGroups = new Map();
+
+        for (const id of sourceNodes) {
+          const targetIds = Array.from(outgoing.get(id) || []).sort((left, right) => labels.get(left).localeCompare(labels.get(right)));
+          const groupKey = targetIds[0] || "ungrouped";
+          if (!sourceGroups.has(groupKey)) sourceGroups.set(groupKey, []);
+          sourceGroups.get(groupKey).push(id);
+        }
+
+        for (const ids of sourceGroups.values()) {
+          ids.sort((left, right) => labels.get(left).localeCompare(labels.get(right)));
+        }
+
+        const sourceGroupOrder = Array.from(sourceGroups.keys()).sort((left, right) => {
+          if (left === "ungrouped") return 1;
+          if (right === "ungrouped") return -1;
+          return labels.get(left).localeCompare(labels.get(right));
+        });
+
+        const sourceGroupByNode = new Map();
+        for (const [groupKey, ids] of sourceGroups.entries()) {
+          for (const id of ids) sourceGroupByNode.set(id, groupKey);
+        }
+
+        const orderByLevel = new Map();
+        orderByLevel.set(0, sourceGroupOrder.flatMap((groupKey) => sourceGroups.get(groupKey) || []));
+
+        for (let depth = 1; depth <= maxLevel; depth++) {
+          const ids = [...(expandedLevelNodes.get(depth) || [])];
+          ids.sort((left, right) => {
+            const leftIsDummy = left.startsWith(dummyPrefix);
+            const rightIsDummy = right.startsWith(dummyPrefix);
+            if (leftIsDummy !== rightIsDummy) return leftIsDummy ? 1 : -1;
+            return labels.get(left).localeCompare(labels.get(right));
+          });
+          orderByLevel.set(depth, ids);
+        }
+
+        function makeIndexMap(ids) {
+          const indexMap = new Map();
+          ids.forEach((id, idx) => indexMap.set(id, idx));
+          return indexMap;
+        }
+
+        function barycenter(id, neighborMap, neighborIndex) {
+          const values = Array.from(neighborMap.get(id) || [])
+            .map((neighborId) => neighborIndex.get(neighborId))
+            .filter((value) => Number.isFinite(value));
+
+          if (!values.length) return Number.MAX_SAFE_INTEGER;
+          return values.reduce((sum, value) => sum + value, 0) / values.length;
+        }
+
+        function sortDepthByNeighbor(depth, neighborMap, neighborDepth) {
+          const ids = [...(orderByLevel.get(depth) || [])];
+          const neighborIndex = makeIndexMap(orderByLevel.get(neighborDepth) || []);
+
+          ids.sort((left, right) => {
+            const leftBary = barycenter(left, neighborMap, neighborIndex);
+            const rightBary = barycenter(right, neighborMap, neighborIndex);
+            if (leftBary === rightBary) return labels.get(left).localeCompare(labels.get(right));
+            return leftBary - rightBary;
+          });
+
+          orderByLevel.set(depth, ids);
+        }
+
+        function sortSourceGroupsByNeighbor() {
+          const neighborIndex = makeIndexMap(orderByLevel.get(1) || []);
+          const keyed = sourceGroupOrder.map((groupKey) => {
+            const ids = sourceGroups.get(groupKey) || [];
+            const values = ids
+              .map((id) => barycenter(id, expandedOutgoing, neighborIndex))
+              .filter((value) => Number.isFinite(value));
+            const groupBary = values.length
+              ? values.reduce((sum, value) => sum + value, 0) / values.length
+              : Number.MAX_SAFE_INTEGER;
+            return { groupKey, groupBary };
+          });
+
+          keyed.sort((left, right) => {
+            if (left.groupBary === right.groupBary) {
+              if (left.groupKey === "ungrouped") return 1;
+              if (right.groupKey === "ungrouped") return -1;
+              return labels.get(left.groupKey).localeCompare(labels.get(right.groupKey));
+            }
+            return left.groupBary - right.groupBary;
+          });
+
+          const sourceOrder = keyed.flatMap(({ groupKey }) => sourceGroups.get(groupKey) || []);
+          orderByLevel.set(0, sourceOrder);
+        }
+
+        function crossingsBetween(depth) {
+          const upper = orderByLevel.get(depth) || [];
+          const lower = orderByLevel.get(depth + 1) || [];
+          if (!upper.length || !lower.length) return 0;
+
+          const lowerIndex = makeIndexMap(lower);
+          const edgeTargets = [];
+
+          for (const source of upper) {
+            const targets = Array.from(expandedOutgoing.get(source) || [])
+              .filter((target) => lowerIndex.has(target))
+              .map((target) => lowerIndex.get(target))
+              .sort((left, right) => left - right);
+
+            for (const targetIndex of targets) {
+              edgeTargets.push(targetIndex);
+            }
+          }
+
+          let inversions = 0;
+          for (let i = 0; i < edgeTargets.length; i++) {
+            for (let j = i + 1; j < edgeTargets.length; j++) {
+              if (edgeTargets[i] > edgeTargets[j]) inversions++;
+            }
+          }
+
+          return inversions;
+        }
+
+        function totalCrossings() {
+          let total = 0;
+          for (let depth = 0; depth < maxLevel; depth++) {
+            total += crossingsBetween(depth);
+          }
+          return total;
+        }
+
+        function canSwapInLevelZero(leftId, rightId) {
+          return sourceGroupByNode.get(leftId) === sourceGroupByNode.get(rightId);
+        }
+
+        function improveByAdjacentSwaps(depth) {
+          const ids = [...(orderByLevel.get(depth) || [])];
+          if (ids.length < 2) return;
+
+          let improved = true;
+          while (improved) {
+            improved = false;
+
+            for (let idx = 0; idx < ids.length - 1; idx++) {
+              const leftId = ids[idx];
+              const rightId = ids[idx + 1];
+              if (depth === 0 && !canSwapInLevelZero(leftId, rightId)) continue;
+
+              orderByLevel.set(depth, ids);
+              const before = totalCrossings();
+
+              ids[idx] = rightId;
+              ids[idx + 1] = leftId;
+              orderByLevel.set(depth, ids);
+
+              const after = totalCrossings();
+              if (after < before) {
+                improved = true;
+              } else {
+                ids[idx] = leftId;
+                ids[idx + 1] = rightId;
+                orderByLevel.set(depth, ids);
+              }
+            }
+          }
+        }
+
+        for (let pass = 0; pass < 8; pass++) {
+          for (let depth = 1; depth <= maxLevel; depth++) {
+            sortDepthByNeighbor(depth, expandedIncoming, depth - 1);
+          }
+
+          if (maxLevel >= 1) {
+            sortSourceGroupsByNeighbor();
+          }
+
+          for (let depth = maxLevel - 1; depth >= 1; depth--) {
+            sortDepthByNeighbor(depth, expandedOutgoing, depth + 1);
+          }
+
+          for (let depth = 0; depth <= maxLevel; depth++) {
+            improveByAdjacentSwaps(depth);
+          }
+
+          if (totalCrossings() === 0) {
+            break;
           }
         }
 
@@ -133,62 +372,18 @@
         const rowGap = 56;
         const columnGap = 260;
 
-        ingredientIds.forEach((id, ingredientIndex) => {
-          positions.set(id, {
-            x: leftX,
-            y: topY + ingredientIndex * rowGap,
-          });
-        });
-
-        const maxLevel = Math.max(...Array.from(level.values()));
-
-        for (let depth = 1; depth <= maxLevel; depth++) {
-          const levelIds = nodes
-            .map((node) => node.data.id)
-            .filter((id) => (level.get(id) || 0) === depth)
-            .sort((left, right) => {
-              const leftIncoming = Array.from(incoming.get(left) || []).map((sourceId) => positions.get(sourceId)?.y).filter((y) => Number.isFinite(y));
-              const rightIncoming = Array.from(incoming.get(right) || []).map((sourceId) => positions.get(sourceId)?.y).filter((y) => Number.isFinite(y));
-
-              const leftAvg = leftIncoming.length
-                ? leftIncoming.reduce((sum, value) => sum + value, 0) / leftIncoming.length
-                : Number.MAX_SAFE_INTEGER;
-              const rightAvg = rightIncoming.length
-                ? rightIncoming.reduce((sum, value) => sum + value, 0) / rightIncoming.length
-                : Number.MAX_SAFE_INTEGER;
-
-              if (leftAvg === rightAvg) {
-                return labels.get(left).localeCompare(labels.get(right));
-              }
-
-              return leftAvg - rightAvg;
-            });
-
-          let previousY = topY - rowGap;
-
-          for (const id of levelIds) {
-            const predecessorYs = Array.from(incoming.get(id) || [])
-              .map((sourceId) => positions.get(sourceId)?.y)
-              .filter((y) => Number.isFinite(y));
-
-            let desiredY = predecessorYs.length
-              ? predecessorYs.reduce((sum, value) => sum + value, 0) / predecessorYs.length
-              : topY;
-
-            if (desiredY < previousY + rowGap) {
-              desiredY = previousY + rowGap;
-            }
-
+        for (let depth = 0; depth <= maxLevel; depth++) {
+          const ids = orderByLevel.get(depth) || [];
+          ids.forEach((id, rowIndex) => {
+            if (!realNodeIds.has(id)) return;
             positions.set(id, {
               x: leftX + depth * columnGap,
-              y: desiredY,
+              y: topY + rowIndex * rowGap,
             });
-
-            previousY = desiredY;
-          }
+          });
         }
 
-        return positions;
+        return { positions, level };
       }
 
       async function loadGraph() {
@@ -199,7 +394,24 @@
 
         const payload = await response.json();
         const elements = normalizeElements(payload);
-        const positions = computePositions(elements);
+        const { positions, level } = computePositions(elements);
+
+        const styledElements = elements.map((element) => {
+          if (element.data && element.data.source && element.data.target) {
+            const sourceLevel = level.get(element.data.source) || 0;
+            const targetLevel = level.get(element.data.target) || 0;
+            const depthDelta = targetLevel - sourceLevel;
+
+            if (depthDelta > 1) {
+              return {
+                ...element,
+                classes: element.classes ? `${element.classes} long-edge` : "long-edge"
+              };
+            }
+          }
+
+          return element;
+        });
 
         if (!elements.length) {
           throw new Error("No nodes/edges found in cytoscape.json");
@@ -207,7 +419,7 @@
 
         cytoscape({
           container: document.getElementById("cy"),
-          elements,
+          elements: styledElements,
           style: [
             {
               selector: "node",
@@ -230,7 +442,15 @@
                 "line-color": "#9ca3af",
                 "target-arrow-color": "#9ca3af",
                 "target-arrow-shape": "triangle",
-                "curve-style": "bezier"
+                "curve-style": "straight"
+              }
+            },
+            {
+              selector: "edge.long-edge",
+              style: {
+                "curve-style": "unbundled-bezier",
+                "control-point-distances": "-70",
+                "control-point-weights": "0.5"
               }
             }
           ],
