@@ -7,12 +7,14 @@
   "scripts": {
     "build": "tsc",
     "start": "node dist/server.js",
-    "dev": "tsx watch src/server.ts"
+    "dev": "tsx watch src/server.ts",
+    "validate:recipe": "tsx src/validateRecipe.ts"
   },
   "dependencies": {
     "@google/genai": "^1.43.0",
     "dotenv": "^17.3.1",
-    "express": "^4.21.2"
+    "express": "^4.21.2",
+    "yaml": "^2.8.2"
   },
   "devDependencies": {
     "@types/express": "^4.17.21",
