@@ -58,14 +58,14 @@ steps:
     - wet ingredients
     - chocolate chips
 
-  id: chilled cookie dough:
+  id: chilled cookie dough
   fridge:
     - cookie dough
 
-  id: portioned cookie dough:
+  id: portioned cookie dough
   portion:
     - chilled cookie dough
 
-  id: cookies:
+  id: cookies
   bake:
     - portioned cookie dough
