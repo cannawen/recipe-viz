@@ -20,10 +20,21 @@ app.use(express.json());
 const publicDir = path.join(__dirname, "..", "public");
 app.use(express.static(publicDir));
 
-const recipePath = path.join(__dirname, "..", "recipe.yml");
+const recipeFileByKey: Record<string, string> = {
+  recipe: "recipe.yml",
+  kimchi: "recipe-kimchi.yml",
+};
 
-app.get("/recipe.mmd", (_req, res) => {
+app.get("/recipe.mmd", (req, res) => {
   try {
+    const recipeKeyRaw = typeof req.query.recipe === "string" ? req.query.recipe : "recipe";
+    const recipeKey = recipeKeyRaw.trim().toLowerCase();
+    const recipeFile = recipeFileByKey[recipeKey];
+    if (!recipeFile) {
+      return res.status(400).type("text/plain").send(`Unknown recipe '${recipeKeyRaw}'. Use one of: ${Object.keys(recipeFileByKey).join(", ")}`);
+    }
+
+    const recipePath = path.join(__dirname, "..", recipeFile);
     const graph = buildMermaidFromRecipeFile(recipePath);
     res.type("text/plain").send(graph);
   } catch (error) {
