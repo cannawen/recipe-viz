@@ -2,7 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { isMap, isScalar, isSeq, parseDocument } from "yaml";
 
-const recipePath = path.join(__dirname, "..", "recipe.yml");
+const recipePath = path.join(__dirname, "..", "cookie.yml");
 const raw = fs.readFileSync(recipePath, "utf8");
 
 const normalizedRaw = raw.replace(

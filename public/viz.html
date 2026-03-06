@@ -21,14 +21,21 @@
       #controls {
         display: flex;
         align-items: center;
-        gap: 8px;
+        gap: 12px;
         padding: 0 12px;
         border-bottom: 1px solid #e5e7eb;
         background: #f9fafb;
       }
 
-      #recipe-select {
-        height: 30px;
+      #controls a {
+        color: #2563eb;
+        text-decoration: none;
+        font-weight: 600;
+      }
+
+      #controls a.active {
+        color: #111827;
+        text-decoration: underline;
       }
 
       #graph {
@@ -49,11 +56,9 @@
   </head>
   <body>
     <div id="controls">
-      <label for="recipe-select">Recipe:</label>
-      <select id="recipe-select">
-        <option value="recipe">recipe.yml</option>
-        <option value="kimchi">recipe-kimchi.yml</option>
-      </select>
+      <span>Recipe:</span>
+      <a id="cookie-link" href="/viz.html?recipe=cookie">Cookie visualization</a>
+      <a id="kimchi-link" href="/viz.html?recipe=kimchi">Kimchi visualization</a>
     </div>
     <div id="graph"></div>
     <div id="status">Loading graph…</div>
@@ -63,28 +68,27 @@
 
       const graphEl = document.getElementById("graph");
       const statusEl = document.getElementById("status");
-      const recipeSelectEl = document.getElementById("recipe-select");
+      const cookieLinkEl = document.getElementById("cookie-link");
+      const kimchiLinkEl = document.getElementById("kimchi-link");
 
       mermaid.initialize({
         startOnLoad: false,
         securityLevel: "loose"
       });
 
-      const url = new URL(window.location.href);
-      const recipeParam = (url.searchParams.get("recipe") || "recipe").toLowerCase();
-      const allowedRecipes = new Set(["recipe", "kimchi"]);
-      const activeRecipe = allowedRecipes.has(recipeParam) ? recipeParam : "recipe";
-      recipeSelectEl.value = activeRecipe;
+      const recipeFromQuery = new URLSearchParams(window.location.search).get("recipe") || "";
+      const pathParts = window.location.pathname.split("/").filter(Boolean);
+      const recipeFromPath = (pathParts[pathParts.length - 1] || "").toLowerCase();
+      const allowedRecipes = new Set(["cookie", "kimchi"]);
+      const activeRecipe = allowedRecipes.has(recipeFromQuery.toLowerCase())
+        ? recipeFromQuery.toLowerCase()
+        : (allowedRecipes.has(recipeFromPath) ? recipeFromPath : "cookie");
 
-      recipeSelectEl.addEventListener("change", () => {
-        const selectedRecipe = recipeSelectEl.value;
-        const nextUrl = new URL(window.location.href);
-        nextUrl.searchParams.set("recipe", selectedRecipe);
-        window.location.href = nextUrl.toString();
-      });
+      cookieLinkEl.classList.toggle("active", activeRecipe === "cookie");
+      kimchiLinkEl.classList.toggle("active", activeRecipe === "kimchi");
 
       async function renderGraph() {
-        const recipeName = recipeSelectEl.value;
+        const recipeName = activeRecipe;
         const response = await fetch(`/recipe.mmd?recipe=${encodeURIComponent(recipeName)}`, { cache: "no-store" });
         if (!response.ok) {
           throw new Error(`Failed to load graph (${response.status})`);

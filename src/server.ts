@@ -21,14 +21,18 @@ const publicDir = path.join(__dirname, "..", "public");
 app.use(express.static(publicDir));
 
 const recipeFileByKey: Record<string, string> = {
-  recipe: "recipe.yml",
-  kimchi: "recipe-kimchi.yml",
+  cookie: "cookie.yml",
+  kimchi: "kimchi.yml",
 };
 
 app.get("/recipe.mmd", (req, res) => {
   try {
-    const recipeKeyRaw = typeof req.query.recipe === "string" ? req.query.recipe : "recipe";
+    const recipeKeyRaw = typeof req.query.recipe === "string" ? req.query.recipe : "";
     const recipeKey = recipeKeyRaw.trim().toLowerCase();
+    if (!recipeKey) {
+      return res.status(400).type("text/plain").send("Missing recipe query parameter. Use one of: cookie, kimchi");
+    }
+
     const recipeFile = recipeFileByKey[recipeKey];
     if (!recipeFile) {
       return res.status(400).type("text/plain").send(`Unknown recipe '${recipeKeyRaw}'. Use one of: ${Object.keys(recipeFileByKey).join(", ")}`);
@@ -93,6 +97,36 @@ app.post("/api/submit-url", async (req, res) => {
   console.log(textRecipe.text);
 
   return res.json({ message: textRecipe.text });
+});
+
+app.get("/viz", (_req, res) => {
+  res
+    .type("text/html")
+    .send(`<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Recipe Visualizations</title>
+    <style>
+      body { font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; margin: 48px auto; max-width: 640px; padding: 0 16px; }
+      h1 { margin-bottom: 8px; }
+      ul { padding-left: 20px; }
+      li { margin: 8px 0; }
+    </style>
+  </head>
+  <body>
+    <h1>Choose a Visualization</h1>
+    <ul>
+      <li><a href="/viz.html?recipe=cookie">Cookie</a></li>
+      <li><a href="/viz.html?recipe=kimchi">Kimchi</a></li>
+    </ul>
+  </body>
+</html>`);
+});
+
+app.get(["/cookie", "/kimchi"], (req, res) => {
+  res.sendFile(path.join(publicDir, "viz.html"));
 });
 
 app.get("*", (_req, res) => {

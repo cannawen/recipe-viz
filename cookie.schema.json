@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "./recipe.schema.json",
+  "$id": "./cookie.schema.json",
   "title": "Recipe Graph",
   "type": "object",
   "required": ["ingredients", "steps"],
